@@ -52,7 +52,7 @@ export default function QuantitySelector({
       <Button
         type="button"
         onClick={handleDecrease}
-        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none  disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:scale-100"
         aria-label="Decrease quantity"
       >
         <Minus size={16} className="text-nsanity-cream" />
@@ -67,9 +67,8 @@ export default function QuantitySelector({
       />
 
       <Button
-       
         onClick={handleIncrease}
-        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-bl-xl"
+        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:scale-100"
         aria-label="Increase quantity"
       >
         <Plus size={20} className="text-nsanity-cream" />

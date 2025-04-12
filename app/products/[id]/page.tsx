@@ -1,9 +1,9 @@
+import ProductCarousel from "@/components/Products/ProductCarousel";
 import QuantitySelector from "@/components/Products/QuantitySelector";
 import Button from "@/components/ui/Button";
 import { getProductById } from "@/lib/utils/product-utils";
 import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -13,9 +13,7 @@ type ProductPageProps = {
   };
 };
 
-export async function generateMetadata({
-  params,
-}: ProductPageProps): Promise<Metadata> {
+export function generateMetadata({ params }: ProductPageProps): Metadata {
   const product = getProductById(params.id);
   if (!product) return { title: "Product not found" };
 
@@ -47,34 +45,7 @@ export default function ProductPage({ params }: ProductPageProps) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="space-y-4">
-            <div className="relative h-[500px] w-full rounded-lg overflow-hidden">
-              <Image
-                src={product.images[0] || "/images/placeholder.webp"}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                quality={100}
-              />
-            </div>
-
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.slice(1).map((image, i) => (
-                <div
-                  key={i}
-                  className="relative h-24 rounded-md overflow-hidden"
-                >
-                  <Image
-                    src={image}
-                    alt={`${product.name} view ${i + 2}`}
-                    fill
-                    className="object-cover cursor-pointer hover:opacity-80 transition-opacity duration-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ProductCarousel images={product.images} productName={product.name} />
 
           {/* Product Details    */}
           <div className="space-y-6">
@@ -120,11 +91,10 @@ export default function ProductPage({ params }: ProductPageProps) {
               </Button>
 
               {/* Favorite Button */}
-              <Button variant="ghost" >
+              <Button variant="ghost">
                 <Heart size={20} />
               </Button>
             </div>
-
           </div>
         </div>
       </div>

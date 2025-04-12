@@ -48,7 +48,7 @@
   --color-nsanity-darkorange: #ff7f4d;
   --color-nsanity-cream: #fff6ed;
   --color-nsanity-gray: #dfe0df;
-  --color-nsanity-red: #C4525A;
+  --color-nsanity-red: #c4525a;
   --color-nsanity-white: #fafafa;
   --color-nsanity-teal: #2aada1;
   --color-nsanity-pink: #ff5d8f;
@@ -140,5 +140,73 @@
 }
 
 .nav-pad {
-  @apply pt-24 pb-16
+  @apply pt-24 pb-16;
+}
+
+/* Modal Entrance animation */
+@keyframes modal-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30vh); /* 30% of viewport height */
+    scale: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    scale: 1;
+  }
+}
+
+.modal-slide-up-animation {
+  animation: modal-slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+}
+
+/* Modal Exit animation */
+@keyframes modal-slide-down {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30vh);
+    scale: 0.5;
+  }
+}
+
+.modal-slide-down-animation {
+  animation: modal-slide-down 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+}
+
+/* Backdrop animations */
+@keyframes backdrop-fade-in {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+@keyframes backdrop-fade-out {
+  0% {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+}
+
+.backdrop-fade-in {
+  animation: backdrop-fade-in 0.5s ease-out forwards;
+}
+
+.backdrop-fade-out {
+  animation: backdrop-fade-out 0.4s ease-out forwards;
 }

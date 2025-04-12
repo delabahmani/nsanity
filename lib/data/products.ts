@@ -21,8 +21,8 @@ export const products: Product[] = [
     price: 29.99,
     images: [
       "/images/products/tshirt-1.webp",
-      "/images/products/tshirt-1.webp",
-      "/images/products/tshirt-1.webp",
+      "/images/products/tshirt-2.webp",
+      "/images/products/tshirt-3.webp",
     ],
     categories: ["t-shirts", "men"],
     sizes: ["S", "M", "L", "XL"],
