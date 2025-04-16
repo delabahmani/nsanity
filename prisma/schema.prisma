@@ -15,6 +15,12 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  cart          String[] // Array of product IDs
+  wishlist      String[] // Array of product IDs
+  address       String?
+  phone         String?
+  orders        Order[]
+  isAdmin       Boolean?  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,4 +57,47 @@ model Session {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  price       Float
+  colors      String[]
+  images      String[]
+  categories  String[]
+  sizes       String[]
+  inStock     Boolean     @default(true)
+  isFeatured  Boolean     @default(false)
+  orderItems  OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @db.ObjectId
+  orderItems  OrderItem[]
+  totalAmount Float
+  status      String // e.g., "pending", "shipped", "delivered"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OrderItem {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String @db.ObjectId
+  productId String @db.ObjectId
+  quantity  Int    @default(1)
+  color     String
+  size      String
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

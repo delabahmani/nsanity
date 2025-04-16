@@ -1,10 +1,11 @@
 "use client";
-import { ShoppingBasket, User } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ProfileBtn from "./ProfileBtn";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,12 +57,7 @@ export default function Navbar() {
             {status === "loading" ? (
               <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent " />
             ) : session ? (
-              <Link
-                href={"/account"}
-                className="text-sm font-semibold text-nsanity-black link-hover"
-              >
-                <User className="h-6 w-6 link-hover" />
-              </Link>
+              <ProfileBtn />
             ) : (
               <Link
                 href={"/auth/sign-in"}
