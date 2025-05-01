@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Product } from "@/lib/data/products";
+import { Product } from "@/lib/utils/product-utils";
 import ProductFilters from "./ProductFilters";
 import ProductGrid from "./ProductGrid";
 import { SlidersHorizontal } from "lucide-react";
@@ -10,7 +10,9 @@ interface ProductsContainerProps {
   products: Product[];
 }
 
-export default function ProductsContainer({ products }: ProductsContainerProps) {
+export default function ProductsContainer({
+  products,
+}: ProductsContainerProps) {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
 
   return (
@@ -22,7 +24,7 @@ export default function ProductsContainer({ products }: ProductsContainerProps) 
               <SlidersHorizontal className="h-5 w-5" />
               Filters
             </h3>
-            <ProductFilters 
+            <ProductFilters
               products={products}
               onFilterChange={setFilteredProducts}
             />

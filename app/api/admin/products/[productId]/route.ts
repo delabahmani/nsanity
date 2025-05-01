@@ -18,7 +18,7 @@ export async function GET(
       );
     }
 
-    const productId = params.productId;
+    const { productId } = await params;
 
     const product = await prisma.product.findUnique({
       where: {
@@ -57,7 +57,7 @@ export async function PATCH(
       );
     }
 
-    const productId = params.productId;
+    const { productId } = await params;
     const { formData } = await req.json();
     const {
       name,
@@ -123,7 +123,7 @@ export async function DELETE(
       );
     }
 
-    const productId = params.productId;
+    const { productId } = await params;
 
     const product = await prisma.product.findUnique({
       where: { id: productId },

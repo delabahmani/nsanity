@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { formData } = await req.json();
+
 
     const {
       name,
@@ -67,8 +67,7 @@ export async function POST(req: NextRequest) {
       inStock,
       isFeatured,
       images,
-    } = formData;
-    console.log("Form Data:", formData);
+    } = await req.json();
 
     const product = await prisma.product.create({
       data: {

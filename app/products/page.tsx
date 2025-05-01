@@ -1,12 +1,18 @@
 import ProductsContainer from "@/components/Products/ProductsContainer";
-import { products } from "@/lib/data/products";
+import { getAllProducts } from "@/lib/utils/product-utils";
 
 export const metadata = {
   title: "Products | nsanity",
   description: "Browse our collection of products",
 };
 
-export default function Products() {
+export default async function Products() {
+  const products = await getAllProducts();
+
+  if (!products) {
+    return <div>Products not found</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen nav-pad bg-[#fffbf8]">
       <div className="">

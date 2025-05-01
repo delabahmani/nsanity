@@ -2,6 +2,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
+import useImageUpload from "@/hooks/useImageUpload";
+import FileUploader from "./FileUploader";
 
 type FormField = {
   id: string;
@@ -45,10 +47,17 @@ export default function AddProductContainer() {
     images: "",
   });
 
+  const {
+    previews,
+    isUploading,
+    handleFilesSelected,
+    handleFilePreviewsGenerated,
+    removeFile,
+    uploadFiles,
+  } = useImageUpload();
+
   useEffect(() => {
     console.log(formData);
-
-    
   }, [formData]);
 
   const handleChange = (
@@ -97,9 +106,15 @@ export default function AddProductContainer() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
+      const imageUrls = await uploadFiles();
+
+      const productData = {
+        ...formData,
+        images: imageUrls,
+      };
 
       if (!formData.name) {
         toast.error("Product name is required!");
@@ -117,13 +132,25 @@ export default function AddProductContainer() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({formData}),
+        body: JSON.stringify(productData),
       });
 
       if (!res.ok) {
         toast.error("Failed to create product");
         throw new Error("Failed to create product");
       }
+
+      setFormData({
+        name: "",
+        description: "",
+        price: 0,
+        colors: [],
+        images: [],
+        categories: [],
+        sizes: [],
+        inStock: true,
+        isFeatured: false,
+      });
 
       toast.success("Product created successfully!");
       router.push("/admin/products");
@@ -148,7 +175,7 @@ export default function AddProductContainer() {
             onChange={handleChange}
             className="w-full border border-nsanity-darkorange rounded-md p-2"
             placeholder="product name"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
             required
           />
         </div>
@@ -161,7 +188,7 @@ export default function AddProductContainer() {
             onChange={handleChange}
             rows={4}
             className="w-full p-2 border border-nsanity-darkorange rounded-md"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
             placeholder="product description"
           />
         </div>
@@ -179,6 +206,13 @@ export default function AddProductContainer() {
           />
         </div>
 
+        <FileUploader
+          onFilesSelected={handleFilesSelected}
+          onFilePreviewsGenerated={handleFilePreviewsGenerated}
+          onRemoveFile={removeFile}
+          existingImagePreviews={previews}
+        />
+
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -187,7 +221,7 @@ export default function AddProductContainer() {
             checked={formData.inStock}
             onChange={handleChange}
             className="h-4 w-4 text-nsanity-darkorange border-gray-300 rounded focus:ring-nsanity-darkorange"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
           />
           <label htmlFor="inStock" className="ml-2 text-md">
             in stock
@@ -202,7 +236,7 @@ export default function AddProductContainer() {
             checked={formData.isFeatured}
             onChange={handleChange}
             className="h-4 w-4 text-nsanity-darkorange border-gray-300 rounded focus:ring-nsanity-darkorange"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
           />
           <label htmlFor="isFeatured">featured product</label>
         </div>
@@ -220,7 +254,7 @@ export default function AddProductContainer() {
                 onChange={handleInputChange}
                 className="border border-nsanity-darkorange rounded-md"
                 placeholder="Add a color (e.g., Red)"
-                disabled={isLoading}
+                disabled={isLoading || isUploading}
               />
               <Button type="button" onClick={() => addItem("colors")}>
                 add
@@ -237,7 +271,7 @@ export default function AddProductContainer() {
                     type="button"
                     onClick={() => removeItem("colors", color)}
                     className="ml-1 text-nsanity-red"
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     x
                   </Button>
@@ -257,7 +291,7 @@ export default function AddProductContainer() {
                 onChange={handleInputChange}
                 className="p-2 border border-nsanity-darkorange rounded-md"
                 placeholder="add a category (e.g., shirts)"
-                disabled={isLoading}
+                disabled={isLoading || isUploading}
               />
               <Button type="button" onClick={() => addItem("categories")}>
                 add
@@ -274,7 +308,7 @@ export default function AddProductContainer() {
                     type="button"
                     onClick={() => removeItem("categories", category)}
                     className="ml-1 text-nsanity-red"
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     x
                   </Button>
@@ -294,7 +328,7 @@ export default function AddProductContainer() {
                 onChange={handleInputChange}
                 className="p-2 border border-nsanity-darkorange rounded-md"
                 placeholder="add a size (e.g., S, M, L"
-                disabled={isLoading}
+                disabled={isLoading || isUploading}
               />
               <Button type="button" onClick={() => addItem("sizes")}>
                 add
@@ -311,7 +345,7 @@ export default function AddProductContainer() {
                     type="button"
                     onClick={() => removeItem("sizes", size)}
                     className="ml-1 text-nsanity-red"
-                    disabled={isLoading}
+                    disabled={isLoading || isUploading}
                   >
                     x
                   </Button>
@@ -328,11 +362,11 @@ export default function AddProductContainer() {
           <Button
             type="button"
             onClick={() => router.back()}
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
           >
             cancel
           </Button>
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading || isUploading}>
             {isLoading ? "loading..." : "create product"}
           </Button>
         </div>

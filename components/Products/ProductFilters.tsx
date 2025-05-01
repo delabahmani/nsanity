@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/data/products";
+import { Product } from "@/lib/utils/product-utils";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 
