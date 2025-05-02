@@ -36,5 +36,11 @@
     "prisma": "^6.6.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "resolutions": {
+    "cookie": ">=0.7.0"
+  },
+  "overrides": {
+    "cookie": ">=0.7.0"
   }
 }
