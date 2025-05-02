@@ -1,5 +1,6 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import prisma from "@/lib/prismadb";
+import { deleteUploadThingFiles } from "@/lib/utils/uploadthing-deletion";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -58,7 +59,6 @@ export async function PATCH(
     }
 
     const { productId } = await params;
-    const { formData } = await req.json();
     const {
       name,
       price,
@@ -69,9 +69,9 @@ export async function PATCH(
       inStock,
       isFeatured,
       images,
-    } = formData;
+    } = await req.json();
 
-    if (formData.price !== undefined && formData.price <= 0) {
+    if (price !== undefined && price <= 0) {
       return NextResponse.json(
         { error: "Price must be greater than 0." },
         { status: 400 }
@@ -136,9 +136,23 @@ export async function DELETE(
       );
     }
 
-    await prisma.product.delete({
+    const deletedProduct = await prisma.product.delete({
       where: { id: productId },
     });
+
+    if (product.images && product.images.length > 0) {
+      deleteUploadThingFiles(product.images)
+        .then((results) => {
+          console.log(
+            `Deleted ${results.filter(Boolean).length} of ${
+              results.length
+            } images for product ${productId}`
+          );
+        })
+        .catch((err) => {
+          console.error("Error deleting product images:", err);
+        });
+    }
 
     return NextResponse.json(
       { message: "Product deleted successfully" },

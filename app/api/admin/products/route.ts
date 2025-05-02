@@ -55,8 +55,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-
-
     const {
       name,
       price,

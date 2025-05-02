@@ -1,5 +1,5 @@
-"use client"
-import AddProductContainer from "@/components/Admin/AddProduct";
+"use client";
+import AddProductContainer from "@/components/Admin/AddProductForm";
 
 export default function AddProduct() {
   return (

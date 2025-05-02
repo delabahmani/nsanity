@@ -21,10 +21,10 @@ export default function ManageProducts() {
           <Link href={"/admin/products/addProduct"}>add product</Link>
         </Button>
         <Button variant="primary" className="text-md md:text-xl h-14">
-          edit product
+          <Link href={"/admin/products/editProduct"}>edit product</Link>
         </Button>
         <Button variant="primary" className="text-md md:text-xl h-14">
-          delete product
+          <Link href={"/admin/products/deleteProduct"}>delete product</Link>
         </Button>
       </div>
     </div>

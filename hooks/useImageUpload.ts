@@ -31,6 +31,9 @@ export default function useImageUpload() {
   const removeFile = useCallback(
     (index: number) => {
       setFiles((prev) => prev.filter((_, i) => i !== index));
+
+      URL.revokeObjectURL(previews[index]);
+      setPreviews((prev) => prev.filter((_, i) => i !== index));
     },
     [previews]
   );
