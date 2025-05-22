@@ -3,6 +3,11 @@ import prisma from "@/lib/prismadb";
 import { deleteUploadThingFiles } from "@/lib/utils/uploadthing-deletion";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-04-30.basil", // Use your Stripe API version
+});
 
 // GET, PATCH, DELETE for admin operations
 export async function GET(
@@ -78,6 +83,40 @@ export async function PATCH(
       );
     }
 
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    await stripe.products.update(product.stripeProductId, {
+      name,
+      description,
+      images: images && images.length > 0 ? images : undefined,
+      metadata: {
+        categories: categories ? categories.join(",") : "",
+        colors: colors ? colors.join(",") : "",
+        sizes: sizes ? sizes.join(",") : "",
+      },
+    });
+
+    let stripePriceId = product.stripePriceId;
+
+    if (price !== undefined && price !== product.price) {
+      await stripe.prices.update(stripePriceId, {
+        active: false,
+      });
+
+      const newPrice = await stripe.prices.create({
+        product: product.stripeProductId,
+        unit_amount: Math.round(price * 100),
+        currency: "cad",
+      });
+      stripePriceId = newPrice.id;
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
@@ -90,6 +129,7 @@ export async function PATCH(
         inStock,
         isFeatured,
         images,
+        stripePriceId,
       },
     });
 
@@ -134,6 +174,16 @@ export async function DELETE(
         { error: "Product not found." },
         { status: 404 }
       );
+    }
+
+    if (product.stripeProductId) {
+      try {
+        await stripe.products.update(product.stripeProductId, {
+          active: false,
+        });
+      } catch (stripeError) {
+        console.error("Error archiving product in Stripe:", stripeError);
+      }
     }
 
     const deletedProduct = await prisma.product.delete({

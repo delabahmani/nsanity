@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prismadb";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-04-30.basil",
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -67,6 +72,23 @@ export async function POST(req: NextRequest) {
       images,
     } = await req.json();
 
+    const stripeProduct = await stripe.products.create({
+      name,
+      description,
+      images: images && images.length > 0 ? images : undefined,
+      metadata: {
+        categories: categories ? categories.join(",") : "",
+        colors: colors ? colors.join(",") : "",
+        sizes: sizes ? sizes.join(",") : "",
+      },
+    });
+
+    const stripePrice = await stripe.prices.create({
+      product: stripeProduct.id,
+      unit_amount: Math.round(price * 100),
+      currency: "cad",
+    });
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -78,6 +100,8 @@ export async function POST(req: NextRequest) {
         isFeatured,
         sizes,
         images,
+        stripeProductId: stripeProduct.id,
+        stripePriceId: stripePrice.id,
       },
     });
 

@@ -60,17 +60,19 @@ model Session {
 }
 
 model Product {
-  id          String      @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  price       Float
-  colors      String[]
-  images      String[]
-  categories  String[]
-  sizes       String[]
-  inStock     Boolean     @default(true)
-  isFeatured  Boolean     @default(false)
-  orderItems  OrderItem[]
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  price           Float
+  colors          String[]
+  images          String[]
+  categories      String[]
+  sizes           String[]
+  inStock         Boolean     @default(true)
+  isFeatured      Boolean     @default(false)
+  orderItems      OrderItem[]
+  stripeProductId String
+  stripePriceId   String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
