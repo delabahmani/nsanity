@@ -50,7 +50,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           size === "lg" && "h-11 px-8 rounded-md",
           size === "xl" && "h-12 text-lg w-40 text-md px-8 rounded-md",
           size === "icon" && "h-10 w-10",
-
           className
         )}
         ref={ref}
