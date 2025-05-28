@@ -6,11 +6,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import ProfileBtn from "./ProfileBtn";
+import { Session } from "next-auth";
 
-export default function Navbar() {
+export default function Navbar({ session }: { session: Session | null }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const path = usePathname();
-  const { data: session, status } = useSession();
 
   const navigation = [
     { name: "home", href: "/", current: path === "/" },
@@ -54,10 +54,8 @@ export default function Navbar() {
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
           <div className="lg:flex lg:gap-x-6 hidden lg:items-center">
-            {status === "loading" ? (
-              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent " />
-            ) : session ? (
-              <ProfileBtn />
+            {session ? (
+              <ProfileBtn session={session} />
             ) : (
               <Link
                 href={"/auth/sign-in"}

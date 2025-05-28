@@ -1,7 +1,16 @@
 import Button from "@/components/ui/Button";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { authOptions } from "../api/auth/[...nextauth]/options";
+import { redirect } from "next/navigation";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.isAdmin) {
+    redirect("/auth/sign-in");
+  }
+
   return (
     <div className="min-h-screen nav-pad flex flex-col">
       <div className="flex p-10 items-center justify-center">
