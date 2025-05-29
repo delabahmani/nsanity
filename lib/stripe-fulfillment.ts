@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import prisma from "./prismadb";
+import { sendTestEmail } from "./utils/send-test-email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
@@ -35,5 +36,11 @@ export async function fulfillCheckout(sessionId: string) {
     data: { status: "fulfilled" },
   });
 
-  console.log(`Order ${orderId} fulfilled!`);
+  // Fetch user info for email
+  const user = await prisma.user.findUnique({ where: { id: order.userId } });
+  if (user && user.email && user.name) {
+    await sendTestEmail(user.email, user.name.split("")[0])
+  }
+
+  console.log(`Order ${orderId} fulfilled and confirmation email sent!`);
 }
