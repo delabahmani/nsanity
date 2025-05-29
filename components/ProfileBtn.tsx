@@ -39,11 +39,14 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
             alt="Profile Picture"
             width={24}
             height={24}
-            className="rounded-full cursor-pointer"
+            className="rounded-full cursor-pointer w-6 h-6 lg:h-7 lg:w-7 hover:scale-105 transition"
             onClick={handleOpen}
           />
         ) : (
-          <User className="h-6 w-6  link-hover" onClick={handleOpen} />
+          <User
+            className="h-6 w-6 lg:w-7 lg:h-7 link-hover"
+            onClick={handleOpen}
+          />
         )}
       </div>
 
@@ -62,7 +65,9 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
               onClick={handleMenuClick}
             >
-              Profile
+              <Link href="/profile" className="block w-full h-full">
+                Profile
+              </Link>
             </li>
             {user?.isAdmin && (
               <li

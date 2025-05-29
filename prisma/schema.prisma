@@ -8,19 +8,20 @@ generator client {
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  cart          String[] // Array of product IDs
-  wishlist      String[] // Array of product IDs
-  address       String?
-  phone         String?
-  orders        Order[]
-  isAdmin       Boolean?  @default(false)
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  accounts         Account[]
+  sessions         Session[]
+  cart             String[] // Array of product IDs
+  wishlist         String[] // Array of product IDs
+  address          String?
+  phone            String?
+  orders           Order[]
+  isAdmin          Boolean?  @default(false)
+  stripeCustomerId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,6 +83,7 @@ model Order {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   userId      String      @db.ObjectId
   orderItems  OrderItem[]
+  orderCode   String?     @unique
   totalAmount Float
   status      String // e.g., "pending", "shipped", "delivered"
 

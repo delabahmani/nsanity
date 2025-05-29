@@ -6,6 +6,7 @@ import QuantitySelector from "@/components/Products/QuantitySelector";
 import Button from "@/components/ui/Button";
 import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 type ProductClientProps = {
   product: any;
@@ -20,6 +21,22 @@ export default function ProductClient({ product }: ProductClientProps) {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
     undefined
   );
+
+  const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please choose a color and size");
+      return;
+    }
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: selectedQuantity,
+      size: selectedSize,
+      color: selectedColor,
+      image: product.images[0],
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-16 nav-pad">
@@ -99,18 +116,7 @@ export default function ProductClient({ product }: ProductClientProps) {
               <Button
                 className="gap-3"
                 variant="primary"
-                onClick={() =>
-                  addToCart({
-                    productId: product.id,
-                    name: product.name,
-                    price: product.price,
-                    quantity: selectedQuantity,
-                    size: selectedSize,
-                    color: selectedColor,
-                    image: product.images[0],
-                  })
-                }
-                disabled={!selectedSize}
+                onClick={handleAddToCart}
               >
                 <ShoppingBag size={20} />
                 Add to Cart

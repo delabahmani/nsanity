@@ -8,6 +8,7 @@ interface QuantitySelectorProps {
   min?: number;
   max?: number;
   onChange?: (quantity: number) => void;
+  size?: "sm" | "md";
 }
 
 export default function QuantitySelector({
@@ -15,6 +16,7 @@ export default function QuantitySelector({
   min = 1,
   max = 99,
   onChange,
+  size = "md",
 }: QuantitySelectorProps) {
   const [quantity, setQuantity] = useState(initialValue);
 
@@ -47,32 +49,43 @@ export default function QuantitySelector({
     }
   };
 
+  const base =
+    "flex items-center border-2 border-nsanity-darkorange rounded-md bg-nsanity-cream";
+  const sizeClass =
+    size === "sm" ? "h-8 w-24 text-xs" : "h-10 max-lg:w-32 lg:w-40";
+
   return (
-    <div className="flex items-center h-10 max-lg:w-32 lg:w-40 border-2 border-nsanity-darkorange rounded-md bg-nsanity-cream">
-      <Button
+    <div className={`${base} ${sizeClass}`}>
+      <button
         type="button"
         onClick={handleDecrease}
-        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:scale-100"
+        className={`flex items-center justify-center cursor-pointer rounded-sm ${
+          size === "sm" ? "w-8 h-8" : "w-14 h-full"
+        } bg-nsanity-darkorange  hover:opacity-80 transition`}
         aria-label="Decrease quantity"
       >
-        <Minus size={16} className="text-nsanity-cream" />
-      </Button>
+        <Minus size={size === "sm" ? 16 : 20} className="text-nsanity-cream" />
+      </button>
 
       <input
         type="text"
         value={quantity}
         onChange={handleChange}
-        className="text-center font-semibold focus:outline-none focus:ring-1 w-full h-full   focus:ring-nsanity-orange"
+        className={`text-center font-semibold focus:outline-none rounded-sm focus:ring-1 ${
+          size === "sm" ? "w-8 text-xs" : "w-12"
+        } h-full focus:ring-nsanity-orange`}
         aria-label="Quantity"
       />
 
-      <Button
+      <button
         onClick={handleIncrease}
-        className="flex items-center justify-center w-14 h-full bg-nsanity-darkorange rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:scale-100"
+        className={`flex items-center justify-center cursor-pointer rounded-sm ${
+          size === "sm" ? "w-8 h-8" : "w-14 h-full"
+        } bg-nsanity-darkorange rounded-none hover:opacity-80 transition`}
         aria-label="Increase quantity"
       >
-        <Plus size={20} className="text-nsanity-cream" />
-      </Button>
+        <Plus size={size === "sm" ? 14 : 20} className="text-nsanity-cream" />
+      </button>
     </div>
   );
 }

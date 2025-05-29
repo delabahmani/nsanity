@@ -9,6 +9,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(req: NextRequest) {
+  function generateOrderCode() {
+    // Example: NS-20240528-123456
+    const date = new Date();
+    const yyyymmdd = date.toISOString().slice(0, 10).replace(/-/g, "");
+    const random = Math.floor(100000 + Math.random() * 900000);
+    return `NS-${yyyymmdd}-${random}`;
+  }
+
   // Authenticate User
   const session = await getServerSession(authOptions);
   if (!session?.user.email) {
@@ -52,12 +60,15 @@ export async function POST(req: NextRequest) {
     })
   );
 
+  const orderCode = generateOrderCode();
+
   // Create Order and OrderItems in DB (status: pending)
   const order = await prisma.order.create({
     data: {
       userId: user.id,
       totalAmount,
       status: "pending",
+      orderCode,
       orderItems: {
         create: orderItems.map((item) => ({
           productId: item.productId,
@@ -70,6 +81,24 @@ export async function POST(req: NextRequest) {
     },
     include: { orderItems: true },
   });
+
+  // Stripe Customer Logic
+  let stripeCustomerId = user.stripeCustomerId;
+  if (!stripeCustomerId) {
+    // Create Stripe customer if nonexistent
+    const customer = await stripe.customers.create({
+      email: user.email!,
+      name: user.name || undefined,
+      metadata: { userId: user.id },
+    });
+    stripeCustomerId = customer.id;
+
+    //Save to DB
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { stripeCustomerId },
+    });
+  }
 
   // Build Stripe line items
   const line_items = orderItems.map((item) => ({
@@ -94,6 +123,7 @@ export async function POST(req: NextRequest) {
   // Create Stripe checkout session
   const checkoutSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
+    customer: stripeCustomerId,
     line_items,
     mode: "payment",
     success_url: `${process.env.NEXT_PUBLIC_APP_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
