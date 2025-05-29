@@ -39,7 +39,7 @@ export async function fulfillCheckout(sessionId: string) {
   // Fetch user info for email
   const user = await prisma.user.findUnique({ where: { id: order.userId } });
   if (user && user.email && user.name) {
-    await sendTestEmail(user.email, user.name.split("")[0])
+    await sendTestEmail(user.email, user.name.split("")[0]);
   }
 
   console.log(`Order ${orderId} fulfilled and confirmation email sent!`);

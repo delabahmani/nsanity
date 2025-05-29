@@ -1,10 +1,10 @@
-import { OurFileRouter } from "@/app/api/uploadthing/core";
-import { generateReactHelpers } from "@uploadthing/react";
+// import { OurFileRouter } from "@/app/api/uploadthing/core";
+// import { generateReactHelpers } from "@uploadthing/react";
 import { X } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback } from "react";
 
-const { useUploadThing } = generateReactHelpers<OurFileRouter>();
+// const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 interface FileUploaderProps {
   onFilesSelected: (files: File[]) => void;

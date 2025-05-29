@@ -5,12 +5,6 @@ import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
 import FileUploader from "./FileUploader";
 
-type FormField = {
-  id: string;
-  label: string;
-  placeholder: string;
-};
-
 type ProductFormData = {
   name: string;
   description: string;

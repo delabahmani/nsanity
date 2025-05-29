@@ -3,6 +3,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import Button from "@/components/ui/Button";
 import { Product } from "@/lib/utils/product-utils";
 import { Trash2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -136,7 +137,9 @@ export default function DeleteProductPage() {
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="relative h-16 w-16">
-                      <img
+                      <Image
+                        width={64}
+                        height={64}
                         src={product.images[0] || "/images/placeholder.webp"}
                         alt={product.name}
                         className="h-16 w-16 object-cover rounded-md"

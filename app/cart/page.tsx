@@ -1,20 +1,24 @@
 "use client";
-import { useCart } from "@/components/CartContext";
+import { CartItem, useCart } from "@/components/CartContext";
 import QuantitySelector from "@/components/Products/QuantitySelector";
 import Button from "@/components/ui/Button";
-import { Product } from "@/lib/utils/product-utils";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-function CartItem({
+function CartItemComponent({
   item,
   updateQuantity,
   removeFromCart,
 }: {
-  item: any;
-  updateQuantity: any;
-  removeFromCart: any;
+  item: CartItem;
+  updateQuantity: (
+    productId: string,
+    quantity: number,
+    size: string,
+    color: string
+  ) => void;
+  removeFromCart: (productId: string, size: string, color: string) => void;
 }) {
   return (
     <div className="flex items-center justify-between bg-nsanity-cream">
@@ -96,9 +100,16 @@ export default function CartPage() {
     <div className="nav-pad flex flex-col lg:flex-row gap-8 bg-nsanity-cream">
       <div className="flex-1">
         <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
+        <Button
+          variant="ghost"
+          onClick={clearCart}
+          className="text-nsanity-red"
+        >
+          Clear Cart
+        </Button>
         {cart.map((item) => (
-          <CartItem
-            key={item.productId + (item.size ?? "") + (item.color ?? "")}
+          <CartItemComponent
+            key={item.productId + item.size + item.color}
             item={item}
             updateQuantity={updateQuantity}
             removeFromCart={removeFromCart}

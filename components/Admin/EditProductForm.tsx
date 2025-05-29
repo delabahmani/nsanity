@@ -5,6 +5,7 @@ import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
 import FileUploader from "./FileUploader";
 import { Product } from "@/lib/utils/product-utils";
+import Image from "next/image";
 
 interface EditProductFormProps {
   initialData: Product;
@@ -211,7 +212,7 @@ export default function EditProductForm({
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
             {formData.images.map((url, index) => (
               <div key={url} className="relative aspect-square">
-                <img
+                <Image
                   src={url}
                   alt={`Product image ${index + 1}`}
                   className="w-full h-full object-cover rounded-md"

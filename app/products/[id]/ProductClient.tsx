@@ -7,9 +7,10 @@ import Button from "@/components/ui/Button";
 import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { Product } from "@/lib/utils/product-utils";
 
 type ProductClientProps = {
-  product: any;
+  product: Product;
 };
 
 export default function ProductClient({ product }: ProductClientProps) {

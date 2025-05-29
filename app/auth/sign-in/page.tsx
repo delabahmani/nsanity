@@ -14,10 +14,9 @@ export default function SignIn() {
         <Image
           src={"/images/bg-1.webp"}
           alt="Background Image"
-          objectFit="cover"
           fill
           priority
-          className="rounded-l-3xl"
+          className="rounded-l-3xl object-cover"
           quality={100}
         />
       </div>

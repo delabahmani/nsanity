@@ -3,6 +3,7 @@ import prisma from "@/lib/prismadb";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
+import { CartItem } from "@/components/CartContext";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
@@ -40,7 +41,16 @@ export async function POST(req: NextRequest) {
   // Fetch product info & build order items
   let totalAmount = 0;
   const orderItems = await Promise.all(
-    cart.map(async (item: any) => {
+    cart.map(async (item: CartItem) => {
+      if (
+        !item.color ||
+        !item.size ||
+        item.color.trim() === "" ||
+        item.size.trim() === ""
+      ) {
+        throw new Error("Each cart item must have a color and size");
+      }
+
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
       });

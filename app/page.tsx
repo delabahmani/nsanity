@@ -1,5 +1,6 @@
 import Button from "@/components/ui/Button";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -16,11 +17,11 @@ export default function Home() {
             className="w-full h-auto "
           />
           <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white">
-            <Button variant="primary" size="xl">
-              <a href="/products" className="text-xl">
+            <Link href="/products" className="text-xl">
+              <Button variant="primary" size="xl" asChild>
                 shop now
-              </a>
-            </Button>
+              </Button>
+            </Link>
           </span>
         </div>
       </section>

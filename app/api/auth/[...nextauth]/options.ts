@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/lib/prismadb";
 import "next-auth";
+import { Adapter } from "next-auth/adapters";
 
 declare module "next-auth" {
   interface Session {
@@ -20,7 +21,7 @@ declare module "next-auth" {
   }
 }
 
-const customPrismaAdapter = PrismaAdapter(prisma) as any;
+const customPrismaAdapter: Adapter = PrismaAdapter(prisma);
 
 export const authOptions: NextAuthOptions = {
   adapter: customPrismaAdapter,

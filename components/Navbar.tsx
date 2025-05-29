@@ -12,7 +12,6 @@ import { Session } from "next-auth";
 import Button from "./ui/Button";
 
 export default function Navbar({ session }: { session: Session | null }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [pop, setPop] = useState(false);
 
   const [cartOpen, setCartOpen] = useState(false);

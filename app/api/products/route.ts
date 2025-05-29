@@ -1,13 +1,14 @@
 // GET all products (public)
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prismadb";
+import { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const featured = searchParams.get("featured");
 
-    const filter: any = {};
+    const filter: Prisma.ProductWhereInput = {};
 
     if (featured === "true") {
       filter.isFeatured = true;

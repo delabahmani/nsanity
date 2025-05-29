@@ -1,5 +1,6 @@
 import PrintButton from "@/components/PrintBtn";
 import prisma from "@/lib/prismadb";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Stripe from "stripe";
 
@@ -8,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export default async function SuccessPage(props: {
-  searchParams: { session_id?: string };
+  searchParams: Promise<{ session_id?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const sessionId = searchParams.session_id;
@@ -21,6 +22,7 @@ export default async function SuccessPage(props: {
       expand: ["line_items"],
     });
   } catch (error) {
+    console.error("Failed to fetch Stripe session:", error);
     return notFound();
   }
 
@@ -72,7 +74,7 @@ export default async function SuccessPage(props: {
                 key={item.id}
                 className="flex items-center gap-3 py-2 border-b last:border-b-0"
               >
-                <img
+                <Image
                   src={item.product.images[0] || "/images/placeholder.webp"}
                   alt={item.product?.name}
                   className="w-14 h-14 rounded border object-cover"
@@ -80,7 +82,8 @@ export default async function SuccessPage(props: {
                 <div className="flex-1">
                   <p className="font-medium">{item.product.name}</p>
                   <p className="text-xs text-black/75">
-                    <span className="font-semibold">Size:</span> {item.size}{" "}
+                    <span className="font-semibold">Size:</span>{" "}
+                    {item.size}{" "}
                   </p>
                   <p className="text-xs text-black/75">
                     <span className="font-semibold">Color:</span> {item.color}

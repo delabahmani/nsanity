@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 // GET, PATCH, DELETE for admin operations
 export async function GET(
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -40,7 +40,7 @@ export async function GET(
     }
 
     return NextResponse.json(product);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -51,7 +51,7 @@ export async function GET(
 // PATCH to update a product (admin only)
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -134,12 +134,16 @@ export async function PATCH(
     });
 
     return NextResponse.json(updatedProduct);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating product:", error);
 
-    if (error.code === "P2025") {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    }
+    if (typeof error === "object" && error !== null && "code" in error)
+      if (error.code === "P2025") {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 }
+        );
+      }
 
     return NextResponse.json(
       { error: "Internal server error" },
@@ -151,7 +155,7 @@ export async function PATCH(
 // DELETE to delete a product (admin only)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -186,7 +190,7 @@ export async function DELETE(
       }
     }
 
-    const deletedProduct = await prisma.product.delete({
+    await prisma.product.delete({
       where: { id: productId },
     });
 

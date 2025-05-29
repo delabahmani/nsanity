@@ -1,3 +1,5 @@
+import prisma from "../prismadb";
+
 export type Product = {
   id: string;
   name: string;
@@ -16,16 +18,10 @@ export type Product = {
 // Helper function to get product by ID
 export async function getProductById(id: string): Promise<Product | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/products/${id}`, {
-      cache: "no-store",
+    const product = await prisma.product.findUnique({
+      where: { id },
     });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    return await res.json();
+    return product as Product | null;
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
@@ -35,16 +31,10 @@ export async function getProductById(id: string): Promise<Product | null> {
 // Helper function to get all products
 export async function getAllProducts(): Promise<Product[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/products`, {
-      cache: "no-store",
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
     });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch products: ${res.statusText}`);
-    }
-
-    return await res.json();
+    return products as Product[];
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];

@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import ProductClient from "./ProductClient";
 
-type ProductPageProps = {
-  params: { id: string };
-};
+interface ProductPageProps {
+  params: Promise<{ id: string }>;
+}
 
 export async function generateMetadata(
   props: ProductPageProps

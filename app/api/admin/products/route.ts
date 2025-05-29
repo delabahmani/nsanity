@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prismadb";
 import Stripe from "stripe";
+import { Prisma } from "@prisma/client";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const featured = searchParams.get("featured");
 
-    const filter: any = {};
+    const filter: Prisma.ProductWhereInput = {};
 
     if (featured === "true") {
       filter.isFeatured = true;

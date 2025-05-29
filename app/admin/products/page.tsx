@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function ManageProducts() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   if (!session) return null;
 

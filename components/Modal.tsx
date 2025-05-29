@@ -1,7 +1,13 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import Button from "./ui/Button";
 
@@ -29,13 +35,13 @@ export default function Modal({
   const [isClosing, setIsClosing] = useState(false);
 
   // Handle modal closing with animation
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       setIsClosing(false);
       onClose();
-    }, 500); // Match this to animation duration
-  };
+    }, 500);
+  }, [onClose]);
 
   // Handle click outside to close
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -85,14 +91,14 @@ export default function Modal({
       document.body.style.overflow = "auto";
       window.removeEventListener("keydown", handleEscapeKey);
     };
-  }, [isOpen, isClosing]);
+  }, [isOpen, isClosing, handleClose]);
 
   // Reset closing state if isOpen changes externally
   useEffect(() => {
     if (isOpen) {
       setIsClosing(false);
     }
-  }, [isOpen]);
+  }, [isOpen, isClosing, handleClose]);
 
   // Use portal to render modal outside of normal DOM hierarchy
   if (!isOpen && !isClosing) return null;
