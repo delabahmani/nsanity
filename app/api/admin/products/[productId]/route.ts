@@ -180,33 +180,37 @@ export async function DELETE(
       );
     }
 
+    // Archive in Stripe first
     if (product.stripeProductId) {
       try {
         await stripe.products.update(product.stripeProductId, {
           active: false,
         });
       } catch (stripeError) {
-        console.error("Error archiving product in Stripe:", stripeError);
+        console.error("Stripe product archiving failed");
+        return NextResponse.json(
+          { error: "Failed to archive product in payment system" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Delete files from uploadthing before database
+    if (product.images && product.images.length > 0) {
+      try {
+        await deleteUploadThingFiles(product.images);
+      } catch (fileError) {
+        console.error("Product file deletion failed");
+        return NextResponse.json(
+          { error: "Failed to delete product files" },
+          { status: 500 }
+        );
       }
     }
 
     await prisma.product.delete({
       where: { id: productId },
     });
-
-    if (product.images && product.images.length > 0) {
-      deleteUploadThingFiles(product.images)
-        .then((results) => {
-          console.log(
-            `Deleted ${results.filter(Boolean).length} of ${
-              results.length
-            } images for product ${productId}`
-          );
-        })
-        .catch((err) => {
-          console.error("Error deleting product images:", err);
-        });
-    }
 
     return NextResponse.json(
       { message: "Product deleted successfully" },

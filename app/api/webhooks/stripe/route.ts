@@ -24,14 +24,13 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-  console.log("🎣 Webhook event received:", event.type); 
 
   if (
     event.type === "checkout.session.completed" ||
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
-    console.log("Processing checkout session:", session.id);
+
     await fulfillCheckout(session.id);
   }
 

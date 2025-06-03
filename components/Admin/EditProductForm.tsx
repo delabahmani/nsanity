@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
@@ -48,12 +48,6 @@ export default function EditProductForm({
     removeFile,
     uploadFiles,
   } = useImageUpload();
-
-  useEffect(() => {
-    if (initialData.images && initialData.images.length > 0) {
-      console.log("Initial images:", initialData.images);
-    }
-  }, [initialData.images]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

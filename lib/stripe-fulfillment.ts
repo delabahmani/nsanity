@@ -10,36 +10,33 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function fulfillCheckout(sessionId: string) {
-  console.log("Fulfilling checkout session");
-
-  // Retrieve the checkout session with line_items expanded
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["line_items"],
   });
 
-  // Only fulfill if payment is NOT unpaid
   if (session.payment_status === "unpaid") return;
 
   const orderId = session.metadata?.orderId;
-  console.log("Stripe session metadata");
-  if (!orderId) return;
+  if (!orderId) {
+    console.error("Missing orderId in Stripe session metadata");
+    return;
+  }
 
-  // Only fulfill if not already fulfilled
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
-      orderItems: {
-        include: { product: true },
-      },
+      orderItems: { include: { product: true } },
       user: true,
     },
   });
+
   if (!order) {
-    console.log("Order not found for id");
+    console.error("Order not found during fulfillment");
     return;
   }
+
   if (order.status === "fulfilled") {
-    console.log("Order already fulfilled");
+    return;
   }
 
   await prisma.order.update({
@@ -47,7 +44,7 @@ export async function fulfillCheckout(sessionId: string) {
     data: { status: "fulfilled" },
   });
 
-  // Send order confirmation email
+  // Send emails
   if (order.user?.email && order.user?.name) {
     try {
       await sendOrderConfirmationEmail({
@@ -62,10 +59,8 @@ export async function fulfillCheckout(sessionId: string) {
           size: item.size,
         })),
         total: order.totalAmount,
-        // shippingAddress: order.shippingAddress
       });
 
-      // Send admin notification
       await sendAdminOrderNotification({
         orderId: order.id,
         customerName: order.user.name,
@@ -79,10 +74,8 @@ export async function fulfillCheckout(sessionId: string) {
           size: item.size,
         })),
       });
-
-      console.log("Order fulfilled and emails sent!");
     } catch (emailError) {
-      console.error("Error sending emails:", emailError);
+      console.error("Order fulfillment email delivery failed");
     }
   }
 }

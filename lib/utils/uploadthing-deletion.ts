@@ -8,7 +8,6 @@ export async function deleteUploadThingFile(url: string): Promise<boolean> {
     !url.includes("utfs.io") &&
     !url.includes("ufs.sh")
   ) {
-    console.log("Not an UploadThing URL:", url);
     return false;
   }
 
@@ -16,15 +15,14 @@ export async function deleteUploadThingFile(url: string): Promise<boolean> {
     const fileKey = url.split("/").pop();
 
     if (!fileKey) {
-      console.error("Could not extract file key from URL:", url);
+      console.error("Could not extract file key from URL");
       return false;
     }
 
     await utapi.deleteFiles(fileKey);
-    console.log("Successfully deleted file:", fileKey);
     return true;
   } catch (error) {
-    console.error("Error deleting file from UploadThing:", error);
+    console.error("Error deleting file from UploadThing");
     return false;
   }
 }

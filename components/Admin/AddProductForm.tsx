@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
@@ -49,10 +49,6 @@ export default function AddProductContainer() {
     removeFile,
     uploadFiles,
   } = useImageUpload();
-
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
