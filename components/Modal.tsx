@@ -1,14 +1,6 @@
-"use client";
-
-import { X } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import Button from "./ui/Button";
 
 interface ModalProps {
@@ -20,9 +12,6 @@ interface ModalProps {
   showCloseButton?: boolean;
 }
 
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
-
 export default function Modal({
   isOpen,
   onClose,
@@ -31,37 +20,71 @@ export default function Modal({
   maxWidth = "max-w-5xl",
   showCloseButton = true,
 }: ModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // Handle modal closing with animation
+  // Handle modal closing with proper animation timing
   const handleClose = useCallback(() => {
     setIsClosing(true);
-    setTimeout(() => {
-      setIsClosing(false);
-      onClose();
-    }, 500);
-  }, [onClose]);
+    // Don't rely on setTimeout - let CSS animation finish naturally
+  }, []);
 
-  // Handle click outside to close
+  // Listen for animation end events
+  useEffect(() => {
+    const modalElement = modalRef.current;
+    const overlayElement = overlayRef.current;
+
+    if (!modalElement || !overlayElement) return;
+
+    const handleAnimationEnd = (e: AnimationEvent) => {
+      // Only handle our specific exit animations
+      if (
+        e.animationName === "modal-slide-down" ||
+        e.animationName === "backdrop-fade-out"
+      ) {
+        if (isClosing) {
+          setIsClosing(false);
+          onClose();
+        }
+      }
+    };
+
+    modalElement.addEventListener("animationend", handleAnimationEnd);
+    overlayElement.addEventListener("animationend", handleAnimationEnd);
+
+    return () => {
+      modalElement.removeEventListener("animationend", handleAnimationEnd);
+      overlayElement.removeEventListener("animationend", handleAnimationEnd);
+    };
+  }, [isClosing, onClose]);
+
+  // Handle click outside to close - with proper blocking during animation
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === overlayRef.current) {
+    // Block ALL clicks during closing animation
+    if (isClosing) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (e.target === e.currentTarget) {
       handleClose();
     }
   };
 
   // Apply body styles immediately when open state changes
-  useIsomorphicLayoutEffect(() => {
-    // This runs synchronously before the browser paints
+  useEffect(() => {
     if (isOpen) {
-      // Save the current padding-right to avoid layout shifts
       const scrollbarWidth =
         window.innerWidth - document.documentElement.clientWidth;
       const originalPaddingRight =
         parseInt(window.getComputedStyle(document.body).paddingRight) || 0;
 
       document.body.style.overflow = "hidden";
-      // Add padding to prevent content shift when scrollbar disappears
       document.body.style.paddingRight = `${
         originalPaddingRight + scrollbarWidth
       }px`;
@@ -75,22 +98,16 @@ export default function Modal({
 
   // Handle escape key to close
   useEffect(() => {
+    if (!isOpen || isClosing) return;
+
     const handleEscapeKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen && !isClosing) {
+      if (e.key === "Escape") {
         handleClose();
       }
     };
 
-    // Lock body scroll when modal is open
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleEscapeKey);
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-      window.removeEventListener("keydown", handleEscapeKey);
-    };
+    window.addEventListener("keydown", handleEscapeKey);
+    return () => window.removeEventListener("keydown", handleEscapeKey);
   }, [isOpen, isClosing, handleClose]);
 
   // Reset closing state if isOpen changes externally
@@ -98,26 +115,29 @@ export default function Modal({
     if (isOpen) {
       setIsClosing(false);
     }
-  }, [isOpen, isClosing, handleClose]);
+  }, [isOpen]);
 
   // Use portal to render modal outside of normal DOM hierarchy
   if (!isOpen && !isClosing) return null;
 
   return createPortal(
     <div
-      className={`fixed inset-0  z-50 flex items-center justify-center  p-4 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${
         isClosing ? "backdrop-fade-out" : "backdrop-fade-in"
       }`}
       ref={overlayRef}
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
+      style={{ pointerEvents: isClosing ? "none" : "auto" }} // Block pointer events during closing
     >
       <div
+        ref={modalRef}
         className={`bg-white rounded-lg shadow-xl relative w-full ${maxWidth} ${
           isClosing ? "modal-slide-down-animation" : "modal-slide-up-animation"
         }`}
         onClick={(e) => e.stopPropagation()}
+        style={{ pointerEvents: "auto" }} // Re-enable for modal content
       >
         {title && (
           <div className="px-6 py-4 border-b">
@@ -130,12 +150,12 @@ export default function Modal({
             className="absolute top-4 right-4 rounded-full hover:bg-gray-100 transition-colors cursor-pointer z-20 hover:border-gray-300 flex items-center justify-center"
             onClick={handleClose}
             aria-label="Close modal"
+            disabled={isClosing} // Disable during animation
           >
             <X
               size={20}
               onClick={(e) => {
                 e.stopPropagation();
-                handleClose();
               }}
               className="cursor-pointer"
             />

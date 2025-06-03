@@ -9,6 +9,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
 
+const BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "https://www.nsanity.shop"
+    : "https://localhost:3000";
+
 export async function POST(req: NextRequest) {
   function generateOrderCode() {
     // Example: NS-20240528-123456
@@ -136,8 +141,8 @@ export async function POST(req: NextRequest) {
     customer: stripeCustomerId,
     line_items,
     mode: "payment",
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
+    success_url: `${BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${BASE_URL}/cart`,
     metadata: {
       userId: user.id,
       orderId: order.id,
