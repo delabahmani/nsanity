@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
+  console.log("🎣 Webhook event received:", event.type); 
 
   if (
     event.type === "checkout.session.completed" ||
