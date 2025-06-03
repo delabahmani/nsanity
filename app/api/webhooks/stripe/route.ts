@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
+    console.log("Processing checkout session:", session.id);
     await fulfillCheckout(session.id);
   }
 
