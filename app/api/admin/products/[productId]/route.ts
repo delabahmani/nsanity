@@ -186,7 +186,7 @@ export async function DELETE(
         await stripe.products.update(product.stripeProductId, {
           active: false,
         });
-      } catch (stripeError) {
+      } catch {
         console.error("Stripe product archiving failed");
         return NextResponse.json(
           { error: "Failed to archive product in payment system" },
@@ -199,7 +199,7 @@ export async function DELETE(
     if (product.images && product.images.length > 0) {
       try {
         await deleteUploadThingFiles(product.images);
-      } catch (fileError) {
+      } catch {
         console.error("Product file deletion failed");
         return NextResponse.json(
           { error: "Failed to delete product files" },

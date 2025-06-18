@@ -4,8 +4,10 @@ import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useCart } from "./CartContext";
 
 export default function ProfileBtn({ session }: { session: Session | null }) {
+  const { clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const user = session?.user;
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -89,6 +91,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
                 setIsOpen(false);
+                clearCart();
                 signOut({ callbackUrl: "/" });
               }}
               aria-label="Sign out"

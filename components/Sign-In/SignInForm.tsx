@@ -42,8 +42,9 @@ export default function SignInForm() {
         } else {
           toast.error(data.error);
         }
-      } catch (error) {
-        toast.error("Registration fialed. Please try again.");
+      } catch (registrationError) {
+        console.error("Registration failed:", registrationError);
+        toast.error("Registration failed. Please try again.");
       }
     } else {
       // Sign in
@@ -60,8 +61,13 @@ export default function SignInForm() {
           toast.success("Welcome back!");
           window.location.href = "/";
         }
-      } catch (error: any) {
-        toast.error(error.message || "Sign in failed. Please try again.");
+      } catch (signInError: unknown) {
+        console.error("Sign in failed:", signInError);
+        const errorMessage =
+          signInError instanceof Error
+            ? signInError.message
+            : "Sign in failed. Please try again.";
+        toast.error(errorMessage);
       }
     }
     setLoading(false);

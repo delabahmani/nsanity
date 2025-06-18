@@ -97,7 +97,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     // Handle Google OAuth linking with existing emails
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! },

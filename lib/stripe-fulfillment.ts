@@ -17,7 +17,9 @@ export async function fulfillCheckout(sessionId: string) {
   if (session.payment_status === "unpaid") return;
 
   const orderId = session.metadata?.orderId;
-  if (!orderId) {
+  const userId = session.metadata?.userId;
+
+  if (!orderId || !userId) {
     console.error("Missing orderId in Stripe session metadata");
     return;
   }
@@ -35,13 +37,19 @@ export async function fulfillCheckout(sessionId: string) {
     return;
   }
 
-  if (order.status === "fulfilled") {
+  if (!order || order.status === "fulfilled") {
     return;
   }
 
   await prisma.order.update({
     where: { id: orderId },
     data: { status: "fulfilled" },
+  });
+
+  // Clear cart after succesful order
+  await prisma.user.update({
+    where: { id: userId },
+    data: { cart: [] },
   });
 
   // Send emails
@@ -74,7 +82,7 @@ export async function fulfillCheckout(sessionId: string) {
           size: item.size,
         })),
       });
-    } catch (emailError) {
+    } catch {
       console.error("Order fulfillment email delivery failed");
     }
   }
