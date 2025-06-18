@@ -12,7 +12,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const BASE_URL =
   process.env.NODE_ENV === "production"
     ? "https://www.nsanity.shop"
-    : "https://localhost:3000";
+    : "http://localhost:3000";
 
 export async function POST(req: NextRequest) {
   function generateOrderCode() {

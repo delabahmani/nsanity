@@ -15,6 +15,7 @@ model User {
   image            String?
   accounts         Account[]
   sessions         Session[]
+  password         String?
   cart             String[] // Array of product IDs
   wishlist         String[] // Array of product IDs
   address          String?

@@ -77,6 +77,9 @@ export default async function SuccessPage(props: {
                 <Image
                   src={item.product.images[0] || "/images/placeholder.webp"}
                   alt={item.product?.name}
+                  width={56}
+                  height={56}
+                  quality={100}
                   className="w-14 h-14 rounded border object-cover"
                 />
                 <div className="flex-1">
