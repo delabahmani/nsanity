@@ -5,6 +5,7 @@ import { authOptions } from "../../auth/[...nextauth]/options";
 import prisma from "@/lib/prismadb";
 import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
+import { printfulService } from "@/lib/printful-service";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
       inStock,
       isFeatured,
       images,
+      printfulTemplateId,
     } = await req.json();
 
     const stripeProduct = await stripe.products.create({
@@ -90,6 +92,23 @@ export async function POST(req: NextRequest) {
       currency: "cad",
     });
 
+    // Create in Printful
+    let printfulSyncProductId = null;
+    if (printfulTemplateId) {
+      try {
+        const printfulProduct = await printfulService.createSyncProduct({
+          name,
+          images,
+          templateId: printfulTemplateId,
+          variants: sizes.flatMap((size: string) =>
+            colors.map((color: string) => ({ size, color, price }))
+          ),
+        });
+      } catch (error) {
+        console.error("Printful sync failed: ", error);
+      }
+    }
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -103,6 +122,8 @@ export async function POST(req: NextRequest) {
         images,
         stripeProductId: stripeProduct.id,
         stripePriceId: stripePrice.id,
+        printfulSyncProductId,
+        printfulTemplateId,
       },
     });
 

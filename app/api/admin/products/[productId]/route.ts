@@ -1,4 +1,5 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { printfulService } from "@/lib/printful-service";
 import prisma from "@/lib/prismadb";
 import { deleteUploadThingFiles } from "@/lib/utils/uploadthing-deletion";
 import { getServerSession } from "next-auth";
@@ -117,6 +118,23 @@ export async function PATCH(
       stripePriceId = newPrice.id;
     }
 
+    // Update Printful if Product exists
+    if (product.printfulSyncProductId) {
+      try {
+        await printfulService.updateSyncProduct(product.printfulSyncProductId, {
+          sync_product: { name, thumbnail: images[0] },
+          sync_variants: sizes.flatMap((size: string) =>
+            colors.map((color: string) => ({
+              retail_price: price.toFixed(2),
+              variant_id: 1,
+            }))
+          ),
+        });
+      } catch (error) {
+        console.error("Printful update failed: ", error);
+      }
+    }
+
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
@@ -192,6 +210,15 @@ export async function DELETE(
           { error: "Failed to archive product in payment system" },
           { status: 500 }
         );
+      }
+    }
+
+    // Delete from Printful
+    if (product.printfulSyncProductId) {
+      try {
+        await printfulService.deleteSyncProduct(product.printfulSyncProductId);
+      } catch (error) {
+        console.error("Printful deletion error: ", error);
       }
     }
 

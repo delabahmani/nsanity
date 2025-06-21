@@ -1,9 +1,10 @@
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
 import FileUploader from "./FileUploader";
+import Image from "next/image";
 
 type ProductFormData = {
   name: string;
@@ -15,7 +16,32 @@ type ProductFormData = {
   sizes: string[];
   inStock: boolean;
   isFeatured: boolean;
+  printfulTemplateId: number | null;
 };
+
+interface PrintArea {
+  title: string;
+  width: number;
+  height: number;
+  top?: number;
+  left?: number;
+}
+
+interface PrintfulTemplate {
+  id: number;
+  title: string;
+  brand: string;
+  model: string;
+  image: string;
+}
+
+const PRINTFUL_TEMPLATES = [
+  { id: 71, name: "Unisex T-Shirt" },
+  { id: 146, name: "Unisex Hoodie" },
+  { id: 70, name: "Tank Top" },
+  { id: 18, name: "Unisex CrewNeck" },
+  { id: 420, name: "Unisex Hat" },
+];
 
 export default function AddProductContainer() {
   const router = useRouter();
@@ -32,6 +58,7 @@ export default function AddProductContainer() {
     sizes: [],
     inStock: false,
     isFeatured: false,
+    printfulTemplateId: null,
   });
 
   const [inputs, setInputs] = useState({
@@ -41,6 +68,11 @@ export default function AddProductContainer() {
     images: "",
   });
 
+  const [printAreas, setPrintAreas] = useState<PrintArea[] | null>(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<PrintfulTemplate | null>(null);
+  const [loadingPrintAreas, setLoadingPrintAreas] = useState(false);
+
   const {
     previews,
     isUploading,
@@ -49,6 +81,40 @@ export default function AddProductContainer() {
     removeFile,
     uploadFiles,
   } = useImageUpload();
+
+  useEffect(() => {
+    const fetchPrintAreas = async () => {
+      if (!formData.printfulTemplateId) {
+        setPrintAreas(null);
+        setSelectedTemplate(null);
+        return;
+      }
+
+      setLoadingPrintAreas(true);
+      try {
+        const res = await fetch(
+          `/api/admin/printful/print-areas/${formData.printfulTemplateId}`
+        );
+        const data = await res.json();
+
+        if (data.success) {
+          setPrintAreas(data.printAreas);
+          setSelectedTemplate(data.product);
+          console.log("Print areas loaded:", data);
+        } else {
+          console.error("Failed to fetch print areas: ", data.error);
+          toast.error("Failed to load print areas");
+        }
+      } catch (error) {
+        console.error("Error fetching print areas: ", error);
+        toast.error("Erorr loading print areas");
+      } finally {
+        setLoadingPrintAreas(false);
+      }
+    };
+
+    fetchPrintAreas();
+  }, [formData.printfulTemplateId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,6 +129,14 @@ export default function AddProductContainer() {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const templateId = parseInt(e.target.value) || null;
+    setFormData((prev) => ({
+      ...prev,
+      printfulTemplateId: templateId,
+    }));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,6 +214,7 @@ export default function AddProductContainer() {
         sizes: [],
         inStock: true,
         isFeatured: false,
+        printfulTemplateId: null,
       });
 
       toast.success("Product created successfully!");
@@ -195,6 +270,64 @@ export default function AddProductContainer() {
             className="w-full p-2 border border-nsanity-darkorange rounded-md"
           />
         </div>
+
+        <div>
+          <label>Printful Product Type</label>
+          <select
+            name="printfulTemplateId"
+            value={formData.printfulTemplateId || ""}
+            onChange={handleTemplateChange}
+            className="w-full border border-nsanity-darkorange rounded-md p-2"
+            disabled={isLoading || isUploading}
+          >
+            <option value="">No Print-on-Demand (Digital Only)</option>
+            {PRINTFUL_TEMPLATES.map((template) => (
+              <option value={template.id} key={template.id}>
+                {template.name}
+              </option>
+            ))}
+          </select>
+
+          {loadingPrintAreas && (
+            <p className="text-sm text-black/75 mt-3">Loading print areas...</p>
+          )}
+
+          <p className="text-sm text-black/75 mt-3">
+            Select a product type to enable print-on-demand fulfillment
+          </p>
+        </div>
+
+        {/* Print-Area Preview */}
+        {printAreas && selectedTemplate && (
+          <div className="border rounded-lg p-4 bg-nsanity-gray">
+            <h3 className="font-semibold mb-2">Print Areas Available:</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h4>Template: {selectedTemplate.title}</h4>
+                <Image
+                  src={selectedTemplate.image}
+                  alt={selectedTemplate.title}
+                  width={200}
+                  height={200}
+                  className="w-32 h-32 rounded border"
+                />
+              </div>
+              <div>
+                <h4 className="font-medium">Print Areas:</h4>
+                <ul className="text-sm space-y-1">
+                  {printAreas.map((area, i) => (
+                    <li key={i} className="flex justify-between">
+                      <span>{area.title}</span>
+                      <span>
+                        {area.width}x{area.height}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
 
         <FileUploader
           onFilesSelected={handleFilesSelected}
