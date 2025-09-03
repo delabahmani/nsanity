@@ -110,12 +110,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (
       status === "authenticated" &&
       previousStatus !== "authenticated" &&
-      session?.user?.email
+      session?.user?.email &&
+      !hasLoadedInitialCart
     ) {
       loadCartFromDatabase();
     } else if (
       status === "unauthenticated" &&
-      previousStatus !== "unauthenticated"
+      previousStatus !== "unauthenticated" &&
+      !hasLoadedInitialCart
     ) {
       loadCartFromLocalStorage();
     }
@@ -127,6 +129,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     previousStatus,
     loadCartFromDatabase,
     loadCartFromLocalStorage,
+    hasLoadedInitialCart,
   ]);
 
   // Prevent saves during loading transitions
@@ -139,9 +142,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       previousStatus === "authenticated"
     ) {
       // Don't save empty cart immediately after loading - only save if cart has items
-      if (cart.length > 0) {
-        saveCartToDatabase();
-      }
+      saveCartToDatabase();
     } else if (
       status === "unauthenticated" &&
       hasLoadedInitialCart &&
@@ -208,9 +209,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("cart");
     }
 
-    // Clear from database if authenticated
+    // Force save empty cart to db if authenticated
     if (status === "authenticated") {
-      saveCartToDatabase(); // Save the empty cart to DB
+      fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ cart: [] }),
+      }).catch(console.error);
     }
   };
 

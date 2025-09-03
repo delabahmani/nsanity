@@ -6,10 +6,39 @@ import prisma from "@/lib/prismadb";
 import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 import { printfulService } from "@/lib/printful-service";
+import { UTApi } from "uploadthing/server";
+
+const utapi = new UTApi();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
+
+async function convertBlobToUploadThingUrl(
+  base64Data: string
+): Promise<string> {
+  try {
+    // Convert base64 to buffer
+    const base64String = base64Data.split(",")[1]; // Remove data:image/png;base64, prefix
+    const buffer = Buffer.from(base64String, "base64");
+
+    // Create File object from buffer
+    const file = new File([buffer], `design_${Date.now()}.png`, {
+      type: "image/png",
+    });
+
+    const uploadResult = await utapi.uploadFiles([file]);
+    if (uploadResult && uploadResult.length > 0 && uploadResult[0].data) {
+      const publicUrl = uploadResult[0].data.ufsUrl || uploadResult[0].data.url;
+      return publicUrl;
+    } else {
+      throw new Error("Failed to upload file to UploadThing");
+    }
+  } catch (error) {
+    console.error("❌ Error converting base64:", error);
+    throw error;
+  }
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -73,7 +102,9 @@ export async function POST(req: NextRequest) {
       isFeatured,
       images,
       printfulTemplateId,
+      designData,
     } = await req.json();
+
 
     const stripeProduct = await stripe.products.create({
       name,
@@ -94,16 +125,60 @@ export async function POST(req: NextRequest) {
 
     // Create in Printful
     let printfulSyncProductId = null;
-    if (printfulTemplateId) {
+    if (printfulTemplateId && designData) {
       try {
+
+        // Map sizes and colors to proper format for Printful
+        const mappedVariants = sizes.flatMap((size: string) =>
+          colors.map((color: string) => ({
+            size: size.toLowerCase(), // Ensure lowercase
+            color: color.toLowerCase(), // Ensure lowercase
+            price,
+          }))
+        );
+
         const printfulProduct = await printfulService.createSyncProduct({
           name,
           images,
           templateId: printfulTemplateId,
-          variants: sizes.flatMap((size: string) =>
-            colors.map((color: string) => ({ size, color, price }))
-          ),
+          variants: mappedVariants,
+          designData: {
+            designFile: await convertBlobToUploadThingUrl(
+              designData.designFile
+            ),
+            position: {
+              x: designData.x,
+              y: designData.y,
+              width: designData.width,
+              height: designData.height,
+            },
+            printArea: designData.printArea,
+            templateInfo: designData.templateInfo,
+          },
         });
+
+        printfulSyncProductId = printfulProduct.id;
+      } catch (error) {
+        console.error("❌ Printful sync failed:", error);
+      }
+    } else if (printfulTemplateId) {
+      // Regular Printful product without custom design
+      try {
+        const mappedVariants = sizes.flatMap((size: string) =>
+          colors.map((color: string) => ({
+            size: size.toLowerCase(),
+            color: color.toLowerCase(),
+            price,
+          }))
+        );
+
+        const printfulProduct = await printfulService.createSyncProduct({
+          name,
+          images,
+          templateId: printfulTemplateId,
+          variants: mappedVariants,
+        });
+        printfulSyncProductId = printfulProduct.id;
       } catch (error) {
         console.error("Printful sync failed: ", error);
       }
@@ -124,6 +199,8 @@ export async function POST(req: NextRequest) {
         stripePriceId: stripePrice.id,
         printfulSyncProductId,
         printfulTemplateId,
+        designPositionData: designData ? JSON.stringify(designData) : null,
+        isPrintOnDemand: !!printfulTemplateId,
       },
     });
 

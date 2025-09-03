@@ -6,11 +6,17 @@ import Image from "next/image";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+import Modal from "../Modal";
 
 export default function SignInForm() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Forgot password states
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -73,6 +79,30 @@ export default function SignInForm() {
     setLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Reset link sent! Check your email.");
+        setShowForgot(false);
+        setResetEmail("");
+      } else {
+        toast.error(data.error || "Could not send reset link.");
+      }
+    } catch (err) {
+      toast.error("Error sending reset link.");
+    }
+    setForgotLoading(false);
+  };
+
   return (
     <div className="nav-pad bg-nsanity-cream min-h-screen w-full flex justify-center items-center flex-col">
       <div className="flex items-center justify-center gap-y-5 flex-col mb-8">
@@ -107,7 +137,6 @@ export default function SignInForm() {
             required
             disabled={loading}
           />
-
           {/* Password Input with Show/Hide Toggle */}
           <div className="relative">
             <input
@@ -135,7 +164,6 @@ export default function SignInForm() {
               )}
             </button>
           </div>
-
           <Button
             type="submit"
             variant="primary"
@@ -144,6 +172,21 @@ export default function SignInForm() {
           >
             {loading ? "Loading..." : isSignUp ? "Create Account" : "Sign In"}
           </Button>
+
+          {/* Forgot password btn */}
+          {!isSignUp && (
+            <div className="text-right mt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                className="text-nsanity-darkorange underline text-sm"
+                onClick={() => setShowForgot(true)}
+                disabled={loading}
+              >
+                Forgot password?
+              </Button>
+            </div>
+          )}
         </form>
 
         <div className="text-center mt-4">
@@ -190,6 +233,34 @@ export default function SignInForm() {
         />
         Continue with Google
       </Button>
+
+      {/* Forgot password modal */}
+      <Modal
+        isOpen={showForgot}
+        onClose={() => setShowForgot(false)}
+        title="Reset your password"
+        maxWidth="max-w-md"
+      >
+        <form onSubmit={handleForgotPassword} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={resetEmail}
+            onChange={(e) => setResetEmail(e.target.value)}
+            className="w-full p-3 border border-nsanity-gray rounded-lg"
+            required
+            disabled={forgotLoading}
+          />
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={forgotLoading}
+            className="w-full"
+          >
+            {forgotLoading ? "Sending..." : "Send reset link"}
+          </Button>
+        </form>
+      </Modal>
     </div>
   );
 }

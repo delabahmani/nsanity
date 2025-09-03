@@ -210,6 +210,8 @@ export default function EditProductForm({
                   src={url}
                   alt={`Product image ${index + 1}`}
                   className="w-full h-full object-cover rounded-md"
+                  width={300}
+                  height={300}
                 />
                 <button
                   type="button"

@@ -2,6 +2,20 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+interface Template {
+  template_id: number;
+  image_url: string;
+  background_color: string;
+  printfile_id: number;
+  template_width: number;
+  template_height: number;
+  print_area_width: number;
+  print_area_height: number;
+  print_area_top: number;
+  print_area_left: number;
+  is_template_on_front: boolean;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ templateId: string }> }
@@ -18,43 +32,75 @@ export async function GET(
 
     const { templateId } = await params;
 
-    // Fetch print areas from Printful
-    const res = await fetch(`https://api.printful.com/products/${templateId}`, {
+    // Get mockup templates from Printful
+    const mockupUrl = `https://api.printful.com/mockup-generator/templates/${templateId}`;
+
+    const mockupRes = await fetch(mockupUrl, {
       headers: {
         Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
         "Content-Type": "application/json",
       },
     });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      return NextResponse.json(
-        {
-          error: `Failed to fetch print areas: ${res.status}`,
-          details: errorText,
-        },
-        { status: res.status }
-      );
-    }
+    const mockupData = await mockupRes.json();
+    const templates: Template[] = mockupData.result?.templates || [];
 
-    const data = await res.json();
+    // Get the FRONT template (the main one for design placement)
+    const frontTemplate = templates.find(
+      (t) =>
+        t.printfile_id === 1 &&
+        t.is_template_on_front &&
+        t.background_color === "#ffffff" // Use white background
+    );
+
+    // Also get product info
+    const productRes = await fetch(
+      `https://api.printful.com/products/${templateId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const productData = await productRes.json();
+    const product = productData.result?.product;
+
+    // Convert template data to our expected format
+    const printAreas = frontTemplate
+      ? [
+          {
+            id: frontTemplate.template_id,
+            title: "Front",
+            template_url: frontTemplate.image_url, // ✅ Real flat template image
+            width: frontTemplate.print_area_width,
+            height: frontTemplate.print_area_height,
+            left: frontTemplate.print_area_left,
+            top: frontTemplate.print_area_top,
+            templateWidth: frontTemplate.template_width,
+            templateHeight: frontTemplate.template_height,
+          },
+        ]
+      : [];
 
     return NextResponse.json({
       success: true,
-      printAreas: data.result.print_files || [],
-      variants: data.result.variants || [],
+      printAreas,
+      variants: productData.result?.variants || [],
       product: {
-        id: data.result.id,
-        title: data.result.title,
-        brand: data.result.brand,
-        model: data.result.model,
-        image: data.result.image,
+        id: product?.id,
+        title: product?.title,
+        brand: product?.brand,
+        model: product?.model,
+        image: frontTemplate?.image_url || product?.image, // ✅ Use flat template as main image
+        templateUrl: frontTemplate?.image_url,
       },
     });
   } catch (error: any) {
-    console.error("Error fetching print areas:", error);
+    console.error("💥 Error fetching template:", error);
     return NextResponse.json(
-      { error: "Failed to fetch print areas", details: error.message },
+      { error: "Failed to fetch template", details: error.message },
       { status: 500 }
     );
   }

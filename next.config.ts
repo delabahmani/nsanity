@@ -7,6 +7,20 @@ const nextConfig: NextConfig = {
       "skq1ktmgha.ufs.sh",
       "uploadthing.com",
     ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "files.cdn.printful.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

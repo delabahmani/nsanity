@@ -6,7 +6,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   productImage: f({
-    image: { maxFileSize: "4MB", maxFileCount: 3 },
+    image: { maxFileSize: "8MB", maxFileCount: 3 },
   })
     // Permissions and file types for this route
     .middleware(async () => {
@@ -20,8 +20,6 @@ export const ourFileRouter = {
     })
 
     .onUploadComplete(async ({ metadata, file }) => {
-      console.log("File upload completed successfully");
-
       return { uploadedBy: metadata.userId, url: file.ufsUrl };
     }),
 } satisfies FileRouter;
