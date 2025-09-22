@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import Button from "./ui/Button";
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,9 +25,9 @@ export default function Modal({
 
   // Handle modal closing with proper animation timing
   const handleClose = useCallback(() => {
+    if (isClosing) return; // Prevent multiple close attempts
     setIsClosing(true);
-    // Don't rely on setTimeout - let CSS animation finish naturally
-  }, []);
+  }, [isClosing]);
 
   // Listen for animation end events
   useEffect(() => {
@@ -38,7 +37,6 @@ export default function Modal({
     if (!modalElement || !overlayElement) return;
 
     const handleAnimationEnd = (e: AnimationEvent) => {
-      // Only handle our specific exit animations
       if (
         e.animationName === "modal-slide-down" ||
         e.animationName === "backdrop-fade-out"
@@ -59,17 +57,13 @@ export default function Modal({
     };
   }, [isClosing, onClose]);
 
-  // Handle click outside to close - with proper blocking during animation
+  // Handle click outside to close
   const handleOverlayClick = (e: React.MouseEvent) => {
-    // Block ALL clicks during closing animation
     if (isClosing) {
       e.preventDefault();
       e.stopPropagation();
       return;
     }
-
-    e.preventDefault();
-    e.stopPropagation();
 
     if (e.target === e.currentTarget) {
       handleClose();
@@ -129,7 +123,7 @@ export default function Modal({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      style={{ pointerEvents: isClosing ? "none" : "auto" }} // Block pointer events during closing
+      style={{ pointerEvents: isClosing ? "none" : "auto" }}
     >
       <div
         ref={modalRef}
@@ -137,7 +131,7 @@ export default function Modal({
           isClosing ? "modal-slide-down-animation" : "modal-slide-up-animation"
         }`}
         onClick={(e) => e.stopPropagation()}
-        style={{ pointerEvents: "auto" }} // Re-enable for modal content
+        style={{ pointerEvents: "auto" }}
       >
         {title && (
           <div className="px-6 py-4 border-b">
@@ -146,20 +140,17 @@ export default function Modal({
         )}
 
         {showCloseButton && (
-          <Button
-            className="absolute top-4 right-4 rounded-full hover:bg-gray-100 transition-colors cursor-pointer z-20 hover:border-gray-300 flex items-center justify-center"
+          <button
+            className="absolute top-4 right-5 w-10 h-10 rounded-full hover:bg-gray-200 hover:cursor-pointer transition-colors flex items-center justify-center z-20 disabled:opacity-50"
             onClick={handleClose}
+            onMouseDown={(e) => e.stopPropagation()} // Prevent event bubbling
+            onMouseUp={(e) => e.stopPropagation()} // Prevent event bubbling
             aria-label="Close modal"
-            disabled={isClosing} // Disable during animation
+            disabled={isClosing}
+            type="button"
           >
-            <X
-              size={20}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              className="cursor-pointer"
-            />
-          </Button>
+            <X size={20} className="text-gray-500 hover:text-gray-700" />
+          </button>
         )}
 
         <div className="p-6">{children}</div>

@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useCart } from "@/components/CartContext";
 import ProductCarousel from "@/components/Products/ProductCarousel";
 import QuantitySelector from "@/components/Products/QuantitySelector";
@@ -14,6 +15,7 @@ type ProductClientProps = {
 };
 
 export default function ProductClient({ product }: ProductClientProps) {
+  const { data: session } = useSession();
   const { addToCart } = useCart();
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
@@ -22,6 +24,30 @@ export default function ProductClient({ product }: ProductClientProps) {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
     undefined
   );
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
+
+  // Check if product is favorited on mount
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (!session?.user?.email) return;
+
+      try {
+        const response = await fetch("/api/user/favorites");
+        if (response.ok) {
+          const data = await response.json();
+          const isProductFavorited = data.products.some(
+            (p: any) => p.id === product.id
+          );
+          setIsFavorited(isProductFavorited);
+        }
+      } catch (error) {
+        console.error("Error checking favorite status:", error);
+      }
+    };
+
+    checkFavoriteStatus();
+  }, [session, product.id]);
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
@@ -37,6 +63,38 @@ export default function ProductClient({ product }: ProductClientProps) {
       color: selectedColor,
       image: product.images[0],
     });
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!session?.user?.email) {
+      toast.error("Please sign in to add favorites");
+      return;
+    }
+
+    setFavoritesLoading(true);
+
+    try {
+      const method = isFavorited ? "DELETE" : "POST";
+      const response = await fetch("/api/user/favorites", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId: product.id }),
+      });
+
+      if (response.ok) {
+        setIsFavorited(!isFavorited);
+        toast.success(
+          isFavorited ? "Removed from favorites" : "Added to favorites"
+        );
+      } else {
+        throw new Error("Failed to update favorites");
+      }
+    } catch (error) {
+      console.error("Error updating favorites:", error);
+      toast.error("Failed to update favorites");
+    } finally {
+      setFavoritesLoading(false);
+    }
   };
 
   return (
@@ -83,6 +141,7 @@ export default function ProductClient({ product }: ProductClientProps) {
                 </span>
               )}
             </div>
+
             {/* Sizes */}
             <div>
               <h3 className="text-lg font-medium mb-3">Sizes</h3>
@@ -102,6 +161,7 @@ export default function ProductClient({ product }: ProductClientProps) {
                 ))}
               </div>
             </div>
+
             {/* Quantity Selector */}
             <div>
               <h3 className="text-lg font-medium mb-3">Quantity</h3>
@@ -112,6 +172,7 @@ export default function ProductClient({ product }: ProductClientProps) {
                 onChange={setSelectedQuantity}
               />
             </div>
+
             {/* Add to Cart */}
             <div className="flex space-x-4 pt-6">
               <Button
@@ -122,9 +183,18 @@ export default function ProductClient({ product }: ProductClientProps) {
                 <ShoppingBag size={20} />
                 Add to Cart
               </Button>
+
               {/* Favorite Button */}
-              <Button variant="ghost">
-                <Heart size={20} />
+              <Button
+                variant="ghost"
+                onClick={handleToggleFavorite}
+                disabled={favoritesLoading}
+                className={`${isFavorited ? "text-red-500" : "text-gray-500"} transition-colors`}
+              >
+                <Heart
+                  size={20}
+                  className={isFavorited ? "fill-current" : ""}
+                />
               </Button>
             </div>
           </div>

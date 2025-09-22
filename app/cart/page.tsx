@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 function CartItemComponent({
   item,
@@ -165,7 +166,7 @@ export default function CartPage() {
             if (data.url) {
               window.location.href = data.url;
             } else {
-              alert(data.error || "Checkout failed");
+              toast.error(data.error || "Checkout failed");
             }
           }}
         >

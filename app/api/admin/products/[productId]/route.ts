@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-04-30.basil", // Use your Stripe API version
+  apiVersion: "2025-04-30.basil",
 });
 
 // GET, PATCH, DELETE for admin operations
@@ -235,12 +235,52 @@ export async function DELETE(
       }
     }
 
+    // Clean up wishlist references BEFORE deleting the product
+    try {
+      const usersWithProduct = await prisma.user.findMany({
+        where: {
+          wishlist: {
+            has: productId,
+          },
+        },
+        select: { id: true, wishlist: true },
+      });
+
+      console.log(
+        `Found ${usersWithProduct.length} users with product ${productId} in their wishlist`
+      );
+
+      if (usersWithProduct.length > 0) {
+        // Update all affected users' wishlists
+        const updatePromises = usersWithProduct.map((user) =>
+          prisma.user.update({
+            where: { id: user.id },
+            data: {
+              wishlist: {
+                set: user.wishlist.filter((id) => id !== productId),
+              },
+            },
+          })
+        );
+
+        await Promise.all(updatePromises);
+        console.log(
+          `Cleaned product ${productId} from ${usersWithProduct.length} users' wishlists`
+        );
+      }
+    } catch (wishlistError) {
+      console.error("Error cleaning wishlist references:", wishlistError);
+    }
+
+    // Finally delete the product from database
     await prisma.product.delete({
       where: { id: productId },
     });
 
     return NextResponse.json(
-      { message: "Product deleted successfully" },
+      {
+        message: "Product deleted successfully",
+      },
       { status: 200 }
     );
   } catch (error) {
