@@ -97,7 +97,7 @@ export default function Contact() {
           <div className="space-y-4">
             <div>
               <label className="block font-medium mb-2">
-                What's this about?
+                What&apos;s this about?
               </label>
               <select
                 name="category"

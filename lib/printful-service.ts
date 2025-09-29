@@ -17,7 +17,9 @@ interface CreateSyncProductParams {
       width: number;
       height: number;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     printArea: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     templateInfo: any;
   };
 }
@@ -69,8 +71,7 @@ class PrintfulService {
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Printful API error: ${res.status} - ${errorText}`);
+      throw new Error(`Printful API error`);
     }
 
     return res.json();
@@ -81,79 +82,93 @@ class PrintfulService {
       const response = await this.request(`/products/${templateId}`);
       return response.result.variants || [];
     } catch (error) {
-      console.error("Error fetching template variants:", error);
-      throw error;
+      console.error("Error fetching template variants: ", error);
+      throw new Error("Failed to fetch variants");
     }
   }
 
   // Updated to use new interface and handle design data
-  async createSyncProduct(params: CreateSyncProductParams) {
-    const { name, images, variants, templateId, designData } = params;
+  async createSyncProduct(
+    params: CreateSyncProductParams
+  ): Promise<{ success: boolean; id?: number; message?: string }> {
+    try {
+      const { name, images, variants, templateId, designData } = params;
 
-    let designFileId = null;
+      let designFileId = null;
 
-    if (designData) {
-      try {
-        designFileId = await this.uploadDesignFile(designData.designFile);
-      } catch (error) {
-        console.error("❌ Failed to upload design file:", error);
-        throw error;
-      }
-    }
-
-    // Update to use async variant lookup
-    const syncVariants = await Promise.all(
-      variants.map(async (variant) => {
-        const variantId = await this.getVariantId(
-          templateId,
-          variant.size,
-          variant.color
-        );
-
-        const variantData: any = {
-          retail_price: variant.price.toFixed(2),
-          variant_id: variantId, // ✅ Now gets real variant ID
-        };
-
-        if (designFileId && designData) {
-          variantData.files = [
-            {
-              id: designFileId,
-              type: "front",
-              position: {
-                area_width: designData.position.width,
-                area_height: designData.position.height,
-                width: designData.position.width,
-                height: designData.position.height,
-                top: designData.position.y,
-                left: designData.position.x,
-              },
-            },
-          ];
-        } else if (images.length > 0) {
-          variantData.files = images.map((img) => ({
-            url: img,
-            type: "front",
-          }));
+      if (designData) {
+        try {
+          designFileId = await this.uploadDesignFile(designData.designFile);
+        } catch (error) {
+          console.error("❌ Failed to upload design file: ", error);
+          throw new Error("Design upload failed");
         }
+      }
 
-        return variantData;
-      })
-    );
+      // Update to use async variant lookup
+      const syncVariants = await Promise.all(
+        variants.map(async (variant) => {
+          const variantId = await this.getVariantId(
+            templateId,
+            variant.size,
+            variant.color
+          );
 
-    const printfulProduct: PrintfulSyncProduct = {
-      sync_product: {
-        name,
-        thumbnail: images[0],
-      },
-      sync_variants: syncVariants,
-    };
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const variantData: any = {
+            retail_price: variant.price.toFixed(2),
+            variant_id: variantId,
+          };
 
-    const res = await this.request("/store/products", {
-      method: "POST",
-      body: JSON.stringify(printfulProduct),
-    });
-    return res.result;
+          if (designFileId && designData) {
+            variantData.files = [
+              {
+                id: designFileId,
+                type: "front",
+                position: {
+                  area_width: designData.position.width,
+                  area_height: designData.position.height,
+                  width: designData.position.width,
+                  height: designData.position.height,
+                  top: designData.position.y,
+                  left: designData.position.x,
+                },
+              },
+            ];
+          } else if (images.length > 0) {
+            variantData.files = images.map((img) => ({
+              url: img,
+              type: "front",
+            }));
+          }
+
+          return variantData;
+        })
+      );
+
+      const printfulProduct: PrintfulSyncProduct = {
+        sync_product: {
+          name,
+          thumbnail: images[0],
+        },
+        sync_variants: syncVariants,
+      };
+
+      const response = await this.request("/store/products", {
+        method: "POST",
+        body: JSON.stringify(printfulProduct),
+      });
+
+      console.log("Printful product created successfully");
+      return {
+        success: true,
+        id: response.result?.sync_product?.id as number,
+        message: "Product created",
+      };
+    } catch (error) {
+      console.error("Printful product creation failed: ", error);
+      return { success: false, message: "Product creation failed" };
+    }
   }
 
   async uploadDesignFile(designFileUrl: string): Promise<number> {
@@ -179,11 +194,13 @@ class PrintfulService {
   }
 
   // Update product in Printful
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async updateSyncProduct(printfulProductId: number, productData: any) {
-    const res = await this.request(`/store/products/${printfulProductId}`, {
+    await this.request(`/store/products/${printfulProductId}`, {
       method: "PUT",
       body: JSON.stringify(productData),
     });
+    console.log("Printful product updated");
   }
 
   // Delete product in Printful
@@ -191,6 +208,7 @@ class PrintfulService {
     await this.request(`/store/products/${printfulProductId}`, {
       method: "DELETE",
     });
+    console.log("Printful product deleted");
   }
 
   // Get available templates
@@ -211,6 +229,7 @@ class PrintfulService {
       const variants = res.result?.variants || [];
 
       // Find matching variant with flexible color matching
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const variant = variants.find((v: any) => {
         const sizeMatch = v.size?.toLowerCase() === size.toLowerCase();
         const colorMatch =
@@ -227,8 +246,8 @@ class PrintfulService {
         throw new Error(`No matching variant found for ${size} ${color}`);
       }
     } catch (error) {
-      console.error("Error fetching variants:", error);
-      throw error;
+      console.error("Error fetching variants: ", error);
+      throw new Error("Failed to fetch variants");
     }
   }
 }

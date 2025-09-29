@@ -7,6 +7,7 @@ import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 import { printfulService } from "@/lib/printful-service";
 import { UTApi } from "uploadthing/server";
+import { File } from "buffer";
 
 const utapi = new UTApi();
 

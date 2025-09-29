@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDrag } from "@use-gesture/react";
 import DesignResizeHandles from "../DesignResizeHandles";
+import Image from "next/image";
 
 interface DesignCanvasProps {
   productMockup: string;
@@ -54,7 +55,6 @@ const DesignCanvas = ({
     ({
       active,
       movement: [mx, my],
-      down,
       memo = [designPosition.x, designPosition.y],
     }) => {
       setIsDragging(active);
@@ -95,11 +95,13 @@ const DesignCanvas = ({
   return (
     <div className="relative w-fit mx-auto">
       {/* Product mockup */}
-      <img
+      <Image
         src={productMockup}
         alt="Product mockup"
         className="max-w-full h-auto"
         style={{ maxWidth: "400px" }}
+        width={1000}
+        height={1000}
       />
 
       {/* Print area overlay (visual guide) */}
@@ -127,11 +129,13 @@ const DesignCanvas = ({
             zIndex: 10,
           }}
         >
-          <img
+          <Image
             src={uploadedDesign}
             alt="Design"
             className="w-full h-full object-contain"
             draggable={false}
+            width={1000}
+            height={1000}
           />
 
           {/* Resize handles */}

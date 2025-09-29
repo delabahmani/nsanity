@@ -97,10 +97,10 @@ export async function GET(
         templateUrl: frontTemplate?.image_url,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("💥 Error fetching template:", error);
     return NextResponse.json(
-      { error: "Failed to fetch template", details: error.message },
+      { error: "Failed to fetch template", details: error },
       { status: 500 }
     );
   }

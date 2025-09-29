@@ -19,10 +19,7 @@ export async function GET(
     const session = await getServerSession(authOptions);
 
     if (!session?.user || !session.user.isAdmin) {
-      return NextResponse.json(
-        { error: "You are not authorized to perform this action." },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const { productId } = await params;
@@ -41,9 +38,10 @@ export async function GET(
     }
 
     return NextResponse.json(product);
-  } catch {
+  } catch (error) {
+    console.error("Error fetching product", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to fetch product" },
       { status: 500 }
     );
   }
@@ -58,10 +56,7 @@ export async function PATCH(
     const session = await getServerSession(authOptions);
 
     if (!session?.user || !session.user.isAdmin) {
-      return NextResponse.json(
-        { error: "You are not authorized to perform this action." },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const { productId } = await params;
@@ -127,6 +122,8 @@ export async function PATCH(
             colors.map((color: string) => ({
               retail_price: price.toFixed(2),
               variant_id: 1,
+              color,
+              size,
             }))
           ),
         });
@@ -179,10 +176,7 @@ export async function DELETE(
     const session = await getServerSession(authOptions);
 
     if (!session?.user || !session.user.isAdmin) {
-      return NextResponse.json(
-        { error: "You are not authorized to perform this action." },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     const { productId } = await params;
@@ -218,7 +212,7 @@ export async function DELETE(
       try {
         await printfulService.deleteSyncProduct(product.printfulSyncProductId);
       } catch (error) {
-        console.error("Printful deletion error: ", error);
+        console.error("Printful deletion error", error);
       }
     }
 
@@ -246,10 +240,6 @@ export async function DELETE(
         select: { id: true, wishlist: true },
       });
 
-      console.log(
-        `Found ${usersWithProduct.length} users with product ${productId} in their wishlist`
-      );
-
       if (usersWithProduct.length > 0) {
         // Update all affected users' wishlists
         const updatePromises = usersWithProduct.map((user) =>
@@ -264,12 +254,9 @@ export async function DELETE(
         );
 
         await Promise.all(updatePromises);
-        console.log(
-          `Cleaned product ${productId} from ${usersWithProduct.length} users' wishlists`
-        );
       }
-    } catch (wishlistError) {
-      console.error("Error cleaning wishlist references:", wishlistError);
+    } catch (error) {
+      console.error("Wishlist cleanup failed", error);
     }
 
     // Finally delete the product from database
@@ -279,12 +266,13 @@ export async function DELETE(
 
     return NextResponse.json(
       {
+        success: true,
         message: "Product deleted successfully",
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error deleting product:", error);
+    console.error("Error deleting product", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -99,6 +99,7 @@ export default function SignInForm() {
       }
     } catch (err) {
       toast.error("Error sending reset link.");
+      console.error("An error occurred during sign in: ", err);
     }
     setForgotLoading(false);
   };

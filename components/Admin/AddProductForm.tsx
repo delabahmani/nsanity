@@ -451,6 +451,10 @@ export default function AddProductContainer() {
             </p>
           )}
 
+          {loadingPrintAreas && (
+            <p className="text-sm text-black/75 mt-3">Loading print areas...</p>
+          )}
+
           <p className="text-sm text-black/75 mt-3">
             {formData.printfulTemplateId
               ? "Select sizes and colors from available Printful options below"
@@ -513,6 +517,7 @@ export default function AddProductContainer() {
                           width: printAreas[0].width || 1001,
                           height: printAreas[0].height || 1335,
                         }}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onDesignUpdate={(designData: any) => {
                           setFinalDesignData({
                             ...designData,

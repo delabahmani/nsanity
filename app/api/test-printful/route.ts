@@ -22,9 +22,9 @@ export async function GET() {
       products: data.result,
       count: data.result?.length || 0,
     });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch Printful products", details: error.message },
+      { error: "Failed to fetch Printful products", details: error },
       { status: 500 }
     );
   }

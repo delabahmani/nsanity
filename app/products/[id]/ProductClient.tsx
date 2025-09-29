@@ -37,6 +37,7 @@ export default function ProductClient({ product }: ProductClientProps) {
         if (response.ok) {
           const data = await response.json();
           const isProductFavorited = data.products.some(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (p: any) => p.id === product.id
           );
           setIsFavorited(isProductFavorited);

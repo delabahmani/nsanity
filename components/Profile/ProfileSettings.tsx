@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -117,7 +118,7 @@ export default function ProfileSettings() {
       } else {
         toast.error("Failed to update email preferences");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Error updating email preferences");
     } finally {
       setLoading(false);
@@ -158,7 +159,7 @@ export default function ProfileSettings() {
         const error = await response.json();
         toast.error(error.message || "Failed to delete account");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Error deleting account");
     } finally {
       setLoading(false);

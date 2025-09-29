@@ -1,13 +1,14 @@
-"use client";
-
 import ResetPasswordForm from "@/components/ResetPasswordForm";
 import Image from "next/image";
+import { Suspense } from "react";
 
-export default function SignIn() {
+export default function ResetPasswordPage() {
   return (
     <div className="flex min-h-screen w-full nav-padding">
       <div className="max-lg:w-full flex items-center justify-center lg:w-2/3 h-full  ">
-        <ResetPasswordForm />
+        <Suspense fallback={<div className="text-center">Loading...</div>}>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
 
       <div className="relative max-lg:hidden w-full">

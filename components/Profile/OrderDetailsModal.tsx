@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Modal from "../Modal";
-import { Calendar, CreditCard, MapPin, Package, X } from "lucide-react";
+import { Calendar, CreditCard, MapPin, Package } from "lucide-react";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
 
@@ -91,19 +91,15 @@ export default function OrderDetailsModal({
   const handleCancelOrder = async () => {
     if (!confirm("Are you sure you want to cancel this order?")) return;
 
-    try {
-      const response = await fetch(`/api/user/orders/${order.id}/cancel`, {
-        method: "POST",
-      });
+    const response = await fetch(`/api/user/orders/${order.id}/cancel`, {
+      method: "POST",
+    });
 
-      if (response.ok) {
-        toast.success("Order cancelled successfully");
-        onClose();
-      } else {
-        toast.error("Failed to cancel order");
-      }
-    } catch (error) {
-      toast.error("Error cancelling order");
+    if (response.ok) {
+      toast.success("Order cancelled successfully");
+      onClose();
+    } else {
+      toast.error("Failed to cancel order");
     }
   };
 

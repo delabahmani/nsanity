@@ -34,6 +34,7 @@ export default function ResetPasswordForm() {
         toast.error(data.error || "Could not reset password.");
       }
     } catch (err) {
+      console.error("Reset password error: ", err);
       toast.error("Error resetting password.");
     }
     setLoading(false);

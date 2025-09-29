@@ -16,7 +16,9 @@ const DesignResizeHandles: React.FC<DesignResizeHandlesProps> = ({
   printArea,
   onResize,
 }) => {
-  const createResizeBind = (edge: ("top" | "bottom" | "left" | "right")[]) => {
+  const useCreateResizeBind = (
+    edge: ("top" | "bottom" | "left" | "right")[]
+  ) => {
     return useDrag(({ down, movement: [mx, my], memo }) => {
       memo = memo || {
         x: designPosition.x,
@@ -64,15 +66,15 @@ const DesignResizeHandles: React.FC<DesignResizeHandlesProps> = ({
     });
   };
 
-  const bindTop = createResizeBind(["top"]);
-  const bindBottom = createResizeBind(["bottom"]);
-  const bindLeft = createResizeBind(["left"]);
-  const bindRight = createResizeBind(["right"]);
+  const bindTop = useCreateResizeBind(["top"]);
+  const bindBottom = useCreateResizeBind(["bottom"]);
+  const bindLeft = useCreateResizeBind(["left"]);
+  const bindRight = useCreateResizeBind(["right"]);
 
-  const bindTopLeft = createResizeBind(["top", "left"]);
-  const bindTopRight = createResizeBind(["top", "right"]);
-  const bindBottomLeft = createResizeBind(["bottom", "left"]);
-  const bindBottomRight = createResizeBind(["bottom", "right"]);
+  const bindTopLeft = useCreateResizeBind(["top", "left"]);
+  const bindTopRight = useCreateResizeBind(["top", "right"]);
+  const bindBottomLeft = useCreateResizeBind(["bottom", "left"]);
+  const bindBottomRight = useCreateResizeBind(["bottom", "right"]);
 
   return (
     <>

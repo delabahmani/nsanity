@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { authOptions} from "@/app/api/auth/[...nextauth]/options";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { printfulService } from "@/lib/printful-service";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { templateId: string } }
+  { params }: { params: Promise<{ templateId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -59,7 +60,7 @@ export async function GET(
       variantsBySize,
     });
   } catch (error) {
-    console.error("❌ Error fetching template variants:", error);
+    console.error("❌ Error fetching template variants", error);
     return NextResponse.json(
       { error: "Failed to fetch template variants" },
       { status: 500 }

@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Send email to gmail
-    const { data, error } = await resend.emails.send({
+    await resend.emails.send({
       from: "contact@nsanity.shop",
       to: ["info.nsanity@gmail.com"],
       subject: `[${category.toUpperCase()}] ${subject}`,
@@ -45,14 +45,6 @@ export async function POST(req: NextRequest) {
       replyTo: email,
     });
 
-    if (error) {
-      console.error("Resend error", error);
-      return NextResponse.json(
-        { error: "Failed to send message" },
-        { status: 500 }
-      );
-    }
-
     // Confirmation email to user
     await resend.emails.send({
       from: "noreply@nsanity.shop",
@@ -79,11 +71,14 @@ export async function POST(req: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      message: "Message sent successfully",
+    });
   } catch (error) {
-    console.error("Contact form error:", error);
+    console.error("Contact form submission failed", error);
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: "Failed to send message" },
       { status: 500 }
     );
   }
