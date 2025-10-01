@@ -32,6 +32,20 @@ export async function getProductById(id: string): Promise<Product | null> {
 export async function getAllProducts(): Promise<Product[]> {
   try {
     const products = await prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        colors: true,
+        images: true,
+        categories: true,
+        sizes: true,
+        inStock: true,
+        isFeatured: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       orderBy: { createdAt: "desc" },
     });
     return products as Product[];

@@ -89,6 +89,7 @@ model Product {
   isPrintOnDemand    Boolean @default(false) // Flag for print-on-demand products
 
   createdAt DateTime @default(now())
+  @@index([createdAt])
   updatedAt DateTime @updatedAt
 }
 

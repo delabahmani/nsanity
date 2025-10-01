@@ -15,6 +15,10 @@ export default function DeleteProductPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // States for bulk deleting
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -24,7 +28,7 @@ export default function DeleteProductPage() {
           throw new Error("Failed to fetch products");
         }
         const data = await res.json();
-        setProducts(data);
+        setProducts(data.products);
       } catch (error) {
         console.error("Error fetching products:", error);
         setError("Failed to load products. Please try again.");
@@ -66,6 +70,64 @@ export default function DeleteProductPage() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedProducts.length === 0) return;
+
+    if (
+      !window.confirm(
+        `Are you sure you want to delete ${selectedProducts.length} selected product(s)? This will also delete all associated images.`
+      )
+    ) {
+      return;
+    }
+
+    setIsBulkDeleting(true);
+    let successCount = 0;
+    let failureCount = 0;
+
+    for (const id of selectedProducts) {
+      try {
+        setIsDeleting((prev) => ({ ...prev, [id]: true }));
+        const res = await fetch(`/api/admin/products/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to delete product ${id}`);
+        }
+
+        setProducts((prev) => prev.filter((product) => product.id !== id));
+        successCount++;
+      } catch (error) {
+        console.error(`Error deleting product ${id}: `, error);
+        failureCount++;
+      } finally {
+        setIsDeleting((prev) => ({ ...prev, [id]: false }));
+      }
+    }
+
+    setSelectedProducts([]);
+    setIsBulkDeleting(false);
+
+    if (successCount > 0) {
+      toast.success(`${successCount} product(s) deleted successfully!`);
+    }
+
+    if (failureCount > 0) {
+      toast.error(`${failureCount} product(s) failed to delete.`);
+    }
+  };
+
+  const handleSelectProduct = (id: string, checked: boolean) => {
+    setSelectedProducts((prev) =>
+      checked ? [...prev, id] : prev.filter((productId) => productId !== id)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedProducts(checked ? products.map((p) => p.id) : []);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen ">
@@ -100,6 +162,28 @@ export default function DeleteProductPage() {
         </Button>
       </div>
 
+      {selectedProducts.length > 0 && (
+        <div className="mb-4 flex items-center gap-4">
+          <span className="text-sm text-gray-600">
+            {selectedProducts.length} product(s) selected
+          </span>
+          <Button
+            onClick={handleBulkDelete}
+            className="bg-red-600 hover:bg-red-700 text-white flex items-center"
+            disabled={isBulkDeleting}
+          >
+            {isBulkDeleting ? (
+              <LoadingSpinner size="small" />
+            ) : (
+              <>
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-xl">No products available to delete</p>
@@ -115,6 +199,17 @@ export default function DeleteProductPage() {
           <table className="min-w-full bg-white border border-gray-200 divide-y divide-gray-200">
             <thead className="bg-gray-100">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedProducts.length === products.length &&
+                      products.length > 0
+                    }
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="h-4 w-4 text-nsanity-darkorange border-gray-300 rounded focus:ring-nsanity-darkorange"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Image
                 </th>
@@ -135,6 +230,17 @@ export default function DeleteProductPage() {
             <tbody className="divide-y divide-gray-200">
               {products.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
+                  {/* NEW: Individual select checkbox */}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.includes(product.id)}
+                      onChange={(e) =>
+                        handleSelectProduct(product.id, e.target.checked)
+                      }
+                      className="h-4 w-4 text-nsanity-darkorange border-gray-300 rounded focus:ring-nsanity-darkorange"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="relative h-16 w-16">
                       <Image
@@ -210,7 +316,7 @@ export default function DeleteProductPage() {
                     <Button
                       onClick={() => handleDelete(product.id)}
                       className="bg-red-600 hover:bg-red-700 text-white flex items-center"
-                      disabled={isDeleting[product.id]}
+                      disabled={isDeleting[product.id] || isBulkDeleting}
                     >
                       {isDeleting[product.id] ? (
                         <LoadingSpinner size="small" />

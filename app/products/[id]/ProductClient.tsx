@@ -98,6 +98,37 @@ export default function ProductClient({ product }: ProductClientProps) {
     }
   };
 
+  const mapColorToCss = (color: string): string => {
+    const colorMap: Record<string, string> = {
+      Ash: "#B2BEB5",
+      Black: "black",
+      "Carolina Blue": "#4B9CD3",
+      Charcoal: "dimgray",
+      "Dark Chocolate": "saddlebrown",
+      "Dark Heather": "darkgray",
+      "Forest Green": "forestgreen",
+      Gold: "gold",
+      "Graphite Heather": "gray",
+      "Heather Deep Royal": "#4169E1",
+      Heliconia: "hotpink",
+      "Indigo Blue": "indigo",
+      "Irish Green": "green",
+      "Light Blue": "lightblue",
+      "Light Pink": "lightpink",
+      Maroon: "maroon",
+      "Military Green": "darkolivegreen",
+      Navy: "navy",
+      Orange: "orange",
+      Purple: "purple",
+      Red: "red",
+      Royal: "royalblue",
+      Sand: "sandybrown",
+      "Sport Grey": "lightgray",
+      White: "white",
+    };
+    return colorMap[color] || "#D3D3D3"; // Fallback to light gray
+  };
+
   return (
     <div className="container mx-auto px-4 py-16 nav-pad">
       <div className="max-w-7xl mx-auto px-4">
@@ -131,7 +162,8 @@ export default function ProductClient({ product }: ProductClientProps) {
                       ? "border-nsanity-darkorange border-2"
                       : "border-none"
                   }`}
-                  style={{ backgroundColor: color.toLowerCase() }}
+                  style={{ backgroundColor: mapColorToCss(color) }}
+                  title={color}
                   aria-label={color}
                   onClick={() => setSelectedColor(color)}
                 />
@@ -142,6 +174,12 @@ export default function ProductClient({ product }: ProductClientProps) {
                 </span>
               )}
             </div>
+            {selectedColor && (
+              <p className="text-sm text-nsanity-black/70 mt-2">
+                Selected:{" "}
+                <span className="text-nsanity-black">{selectedColor}</span>
+              </p>
+            )}
 
             {/* Sizes */}
             <div>

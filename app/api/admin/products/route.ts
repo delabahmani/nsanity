@@ -36,7 +36,7 @@ async function convertBlobToUploadThingUrl(
       throw new Error("Failed to upload file to UploadThing");
     }
   } catch (error) {
-    console.error("❌ Error converting base64:", error);
+    console.error("Error converting base64:", error);
     throw error;
   }
 }
@@ -54,6 +54,8 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const featured = searchParams.get("featured");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
 
     const filter: Prisma.ProductWhereInput = {};
 
@@ -63,14 +65,20 @@ export async function GET(req: NextRequest) {
       filter.isFeatured = false;
     }
 
+    const skip = (page - 1) * limit;
+
     const products = await prisma.product.findMany({
       where: filter,
       orderBy: {
         createdAt: "desc",
       },
+      take: limit,
+      skip: skip,
     });
 
-    return NextResponse.json(products);
+    const total = await prisma.product.count({ where: filter });
+
+    return NextResponse.json({ products, total, page, limit });
   } catch (error) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
@@ -106,6 +114,12 @@ export async function POST(req: NextRequest) {
       designData,
     } = await req.json();
 
+    if (printfulTemplateId && (!images || images.length === 0)) {
+      return NextResponse.json(
+        { error: "Product image is required for Printful products" },
+        { status: 400 }
+      );
+    }
 
     const stripeProduct = await stripe.products.create({
       name,
@@ -128,12 +142,11 @@ export async function POST(req: NextRequest) {
     let printfulSyncProductId = null;
     if (printfulTemplateId && designData) {
       try {
-
         // Map sizes and colors to proper format for Printful
         const mappedVariants = sizes.flatMap((size: string) =>
           colors.map((color: string) => ({
-            size: size.toLowerCase(), // Ensure lowercase
-            color: color.toLowerCase(), // Ensure lowercase
+            size: size.toLowerCase(),
+            color: color.toLowerCase(),
             price,
           }))
         );
@@ -160,7 +173,11 @@ export async function POST(req: NextRequest) {
 
         printfulSyncProductId = printfulProduct.id;
       } catch (error) {
-        console.error("❌ Printful sync failed:", error);
+        console.error("Printful sync failed:", error);
+        return NextResponse.json(
+          { error: `Failed to create Printful product: ${error}` },
+          { status: 500 }
+        );
       }
     } else if (printfulTemplateId) {
       // Regular Printful product without custom design
@@ -179,9 +196,14 @@ export async function POST(req: NextRequest) {
           templateId: printfulTemplateId,
           variants: mappedVariants,
         });
+
         printfulSyncProductId = printfulProduct.id;
       } catch (error) {
         console.error("Printful sync failed: ", error);
+        return NextResponse.json(
+          { error: `Failed to create Printful product: ${error}` },
+          { status: 500 }
+        );
       }
     }
 

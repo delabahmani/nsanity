@@ -6,18 +6,51 @@ interface ProductCardProps {
   product: Product;
 }
 
+const mapColorToCss = (color: string): string => {
+  const colorMap: Record<string, string> = {
+    Ash: "#B2BEB5",
+    Black: "black",
+    "Carolina Blue": "#4B9CD3",
+    Charcoal: "dimgray",
+    "Dark Chocolate": "saddlebrown",
+    "Dark Heather": "darkgray",
+    "Forest Green": "forestgreen",
+    Gold: "gold",
+    "Graphite Heather": "gray",
+    "Heather Deep Royal": "#4169E1",
+    Heliconia: "hotpink",
+    "Indigo Blue": "indigo",
+    "Irish Green": "green",
+    "Light Blue": "lightblue",
+    "Light Pink": "lightpink",
+    Maroon: "maroon",
+    "Military Green": "darkolivegreen",
+    Navy: "navy",
+    Orange: "orange",
+    Purple: "purple",
+    Red: "red",
+    Royal: "royalblue",
+    Sand: "sandybrown",
+    "Sport Grey": "lightgray",
+    White: "white",
+  };
+  return colorMap[color] || "#D3D3D3";
+};
+
 export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/products/${product.id}`} className="group">
       <div className="bg-nsanity-cream rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl">
-        <div className="relative h-96 w-full">
-          <Image
-            src={product.images[0] || "/images/placeholder.webp"}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300 "
-            priority
-          />
+        <div className="relative h-96 w-full bg-[#FFFFFF] flex items-center justify-center p-6">
+          <div className="relative h-full w-full flex items-center justify-center">
+            <Image
+              src={product.images[0] || "/images/placeholder.webp"}
+              alt={product.name}
+              fill
+              className="object-contain group-hover:scale-105 transition-transform duration-300"
+              priority
+            />
+          </div>
         </div>
 
         <div className="p-4">
@@ -31,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               <div
                 key={color}
                 className="w-4 h-4 rounded-full border border-gray-300"
-                style={{ backgroundColor: color.toLowerCase() }}
+                style={{ backgroundColor: mapColorToCss(color) }}
                 aria-label={color}
               />
             ))}

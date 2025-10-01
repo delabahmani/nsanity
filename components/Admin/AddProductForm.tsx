@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
@@ -39,12 +39,21 @@ interface PrintfulTemplate {
   image: string;
 }
 
+interface PrintfulVariantFile {
+  type: string | null;
+  position: string | null;
+  preview_url: string | null;
+  thumbnail_url: string | null;
+}
+
 interface PrintfulVariant {
   id: number;
   name: string;
   size: string;
   color: string;
   price: string;
+  image: string;
+  files: PrintfulVariantFile[];
 }
 
 interface PrintfulVariantsData {
@@ -83,6 +92,7 @@ export default function AddProductContainer() {
   const [loadingVariants, setLoadingVariants] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [mockupUrl, setMockupUrl] = useState<string | null>(null);
 
   // form state
   const [formData, setFormData] = useState<ProductFormData>({
@@ -119,11 +129,60 @@ export default function AddProductContainer() {
     uploadFiles,
   } = useImageUpload();
 
+  const updateMockupForColor = useCallback(
+    (color?: string | null) => {
+      if (!printfulVariants?.variants?.length) {
+        setMockupUrl(selectedTemplate?.image ?? null);
+        return;
+      }
+
+      let matchingVariant: PrintfulVariant | undefined;
+
+      if (color) {
+        // Direct case-insensitive match
+        matchingVariant = printfulVariants.variants.find(
+          (variant) => variant.color.toLowerCase() === color.toLowerCase()
+        );
+      }
+
+      // Fallback to first variant if no color specified or no match
+      const chosenVariant = matchingVariant ?? printfulVariants.variants[0];
+
+      if (!chosenVariant) {
+        setMockupUrl(selectedTemplate?.image ?? null);
+        return;
+      }
+
+      // Find front preview file
+      const frontPreview = chosenVariant.files.find(
+        (file) => file.type === "preview" && file.position === "front"
+      );
+
+      // Fallback to any preview file
+      const anyPreview = chosenVariant.files.find(
+        (file) => file.type === "preview"
+      );
+
+      const newMockupUrl =
+        frontPreview?.preview_url ??
+        frontPreview?.thumbnail_url ??
+        anyPreview?.preview_url ??
+        anyPreview?.thumbnail_url ??
+        chosenVariant.image ??
+        selectedTemplate?.image ??
+        null;
+
+      setMockupUrl(newMockupUrl);
+    },
+    [printfulVariants, selectedTemplate]
+  );
+
   useEffect(() => {
     const fetchPrintAreas = async () => {
       if (!formData.printfulTemplateId) {
         setPrintAreas(null);
         setSelectedTemplate(null);
+        setMockupUrl(null);
         return;
       }
 
@@ -159,6 +218,7 @@ export default function AddProductContainer() {
         setPrintfulVariants(null);
         setSelectedSizes([]);
         setSelectedColors([]);
+        setMockupUrl(null);
         return;
       }
 
@@ -198,6 +258,27 @@ export default function AddProductContainer() {
 
   // update formData when printful selections change
   useEffect(() => {
+    if (formData.printfulTemplateId && selectedTemplate) {
+      updateMockupForColor(selectedColors[0] ?? null);
+    } else if (selectedTemplate) {
+      setMockupUrl(selectedTemplate.image);
+    } else {
+      setMockupUrl(null);
+    }
+  }, [
+    formData.printfulTemplateId,
+    selectedTemplate,
+    selectedColors,
+    updateMockupForColor,
+  ]);
+
+  useEffect(() => {
+    if (printfulVariants?.variants?.length && !selectedColors.length) {
+      updateMockupForColor(printfulVariants.variants[0]?.color ?? null);
+    }
+  }, [printfulVariants, selectedColors.length, updateMockupForColor]);
+
+  useEffect(() => {
     if (
       formData.printfulTemplateId &&
       selectedSizes.length > 0 &&
@@ -218,9 +299,20 @@ export default function AddProductContainer() {
   };
 
   const handleColorChange = (color: string, checked: boolean) => {
-    setSelectedColors((prev) =>
-      checked ? [...prev, color] : prev.filter((c) => c !== color)
-    );
+    setSelectedColors((prev) => {
+      const next = checked
+        ? [...prev, color]
+        : prev.filter((existingColor) => existingColor !== color);
+
+      const referenceColor = checked ? color : next[0];
+      if (referenceColor) {
+        updateMockupForColor(referenceColor);
+      } else {
+        updateMockupForColor(null);
+      }
+
+      return next;
+    });
   };
 
   const handleChange = (
@@ -291,14 +383,12 @@ export default function AddProductContainer() {
     setIsLoading(true);
 
     try {
-      // Check if design is positioned properly
       if (formData.printfulTemplateId && !finalDesignData) {
         toast.error("Please position your design on the canvas first!");
         setIsLoading(false);
         return;
       }
 
-      // For uploading regular product mockups
       const imageUrls = await uploadFiles();
 
       let designFileData = null;
@@ -311,9 +401,15 @@ export default function AddProductContainer() {
           templateInfo: selectedTemplate,
         };
       }
+
+      const productImages =
+        formData.printfulTemplateId && mockupUrl
+          ? [mockupUrl, ...imageUrls]
+          : imageUrls;
+
       const productData = {
         ...formData,
-        images: imageUrls,
+        images: productImages,
         designData: designFileData,
       };
 
@@ -329,9 +425,14 @@ export default function AddProductContainer() {
         return;
       }
 
+      if (formData.printfulTemplateId && productImages.length === 0) {
+        toast.error("No product image available. Please try again");
+        setIsLoading(false);
+        return;
+      }
+
       const res = await fetch("/api/admin/products", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
@@ -341,6 +442,39 @@ export default function AddProductContainer() {
       if (!res.ok) {
         toast.error("Failed to create product");
         throw new Error("Failed to create product");
+      }
+
+      const { product } = await res.json();
+
+      if (formData.printfulTemplateId && product.id) {
+        toast.loading("Generating Printful mockups...", { id: "mockups" });
+
+        try {
+          const mockupRes = await fetch(
+            `/api/admin/printful/mockups/${product.id}`,
+            {
+              method: "POST",
+            }
+          );
+
+          const mockupData = await mockupRes.json();
+
+          if (mockupData.success) {
+            toast.success("Mockups generated successfuly!", { id: "mockups" });
+          } else if (mockupRes.status === 202) {
+            toast.success(
+              "Product created! Mockups will be available shortly.",
+              { id: "mockups" }
+            );
+          } else {
+            toast.error("Mockups not ready yet", { id: "mockups" });
+          }
+        } catch (mockupError) {
+          console.error("Error fetching mockups: ", mockupError);
+          toast.error("Product created, but mockups failed ot load", {
+            id: "mockups",
+          });
+        }
       }
 
       setFormData({
@@ -356,12 +490,12 @@ export default function AddProductContainer() {
         printfulTemplateId: null,
       });
 
-      // Reset design-related states
       setDesignFile(null);
       setShowDesignCanvas(false);
       setFinalDesignData(null);
       setPrintAreas(null);
       setSelectedTemplate(null);
+      setMockupUrl(null);
 
       toast.success("Product created successfully!");
       router.push("/admin/products");
@@ -387,7 +521,6 @@ export default function AddProductContainer() {
   return (
     <div className="max-w-4xl mx-auto min-h-screen nav-pad flex flex-col">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* basic info */}
         <div>
           <label>product name</label>
           <input
@@ -462,7 +595,6 @@ export default function AddProductContainer() {
           </p>
         </div>
 
-        {/* Design Canvas section */}
         {formData.printfulTemplateId && (
           <div className="border rounded-lg p-4 bg-nsanity-gray/50">
             <h3 className="font-semibold mb-4">design placement</h3>
@@ -509,7 +641,7 @@ export default function AddProductContainer() {
                         Design Canvas
                       </h3>
                       <DesignCanvas
-                        productMockup={selectedTemplate.image}
+                        productMockup={mockupUrl ?? selectedTemplate.image}
                         uploadedDesign={designFile}
                         printArea={{
                           x: printAreas[0].left || 1009,
@@ -538,7 +670,6 @@ export default function AddProductContainer() {
           </div>
         )}
 
-        {/* Print-Area Preview */}
         {printAreas && selectedTemplate && !showDesignCanvas && (
           <div className="border rounded-lg p-4 bg-nsanity-gray">
             <h3 className="font-semibold mb-2">Print Areas Available:</h3>
@@ -546,11 +677,11 @@ export default function AddProductContainer() {
               <div>
                 <h4>Template: {selectedTemplate.title}</h4>
                 <Image
-                  src={selectedTemplate.image}
+                  src={mockupUrl ?? selectedTemplate.image}
                   alt={selectedTemplate.title}
                   width={200}
                   height={200}
-                  className="w-32 h-32 rounded border"
+                  className="w-32 h-32 rounded border object-contain bg-white"
                 />
               </div>
               <div>
@@ -605,12 +736,9 @@ export default function AddProductContainer() {
           <label htmlFor="isFeatured">featured product</label>
         </div>
 
-        {/* UPDATED: Conditional rendering for sizes, colors, and categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {formData.printfulTemplateId && printfulVariants ? (
-            // Printful product: Show dropdowns/checkboxes
             <>
-              {/* Printful Sizes */}
               <div>
                 <label className="font-medium mb-3 block">
                   Available Sizes
@@ -636,7 +764,6 @@ export default function AddProductContainer() {
                 </p>
               </div>
 
-              {/* Printful Colors */}
               <div>
                 <label className="font-medium mb-3 block">
                   Available Colors
@@ -663,9 +790,7 @@ export default function AddProductContainer() {
               </div>
             </>
           ) : !formData.printfulTemplateId ? (
-            // Manual product: Show input fields
             <>
-              {/* Manual Colors */}
               <div>
                 <label className="font-medium mb-1">Colors</label>
                 <div className="flex">
@@ -702,7 +827,6 @@ export default function AddProductContainer() {
                 </div>
               </div>
 
-              {/* Manual Sizes */}
               <div>
                 <label className="font-medium mb-1">Sizes</label>
                 <div className="flex">
@@ -739,7 +863,6 @@ export default function AddProductContainer() {
                 </div>
               </div>
 
-              {/* Manual Categories */}
               <div className="md:col-span-2">
                 <label className="font-medium mb-1">Categories</label>
                 <div className="flex">
@@ -777,14 +900,12 @@ export default function AddProductContainer() {
               </div>
             </>
           ) : (
-            // Loading state
             <div className="md:col-span-2 text-center py-4">
               <p>Loading product options...</p>
             </div>
           )}
         </div>
 
-        {/* form actions */}
         <div className="flex gap-4">
           <Button
             type="button"

@@ -100,7 +100,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ cart }),
       });
     } catch (error) {
-      console.error("❌ Failed to save cart to database:", error);
+      console.error("Failed to save cart to database:", error);
     }
   }, [cart, hasLoadedInitialCart]);
 

@@ -73,7 +73,7 @@ export async function GET(
           {
             id: frontTemplate.template_id,
             title: "Front",
-            template_url: frontTemplate.image_url, // ✅ Real flat template image
+            template_url: frontTemplate.image_url,
             width: frontTemplate.print_area_width,
             height: frontTemplate.print_area_height,
             left: frontTemplate.print_area_left,
@@ -93,7 +93,7 @@ export async function GET(
         title: product?.title,
         brand: product?.brand,
         model: product?.model,
-        image: frontTemplate?.image_url || product?.image, // ✅ Use flat template as main image
+        image: frontTemplate?.image_url || product?.image,
         templateUrl: frontTemplate?.image_url,
       },
     });

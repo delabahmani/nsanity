@@ -49,7 +49,6 @@ export default function ProfileOrders() {
         }
 
         const data = await res.json();
-        console.log("Orders data:", data); // Debug log
 
         setOrders(data.orders || []);
       } catch (err) {

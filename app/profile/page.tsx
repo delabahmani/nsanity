@@ -129,7 +129,6 @@ export default function ProfilePage() {
       }
 
       setIsEditing(false);
-      // You could show a success message here
       console.log("Profile updated successfully");
     } catch (err) {
       console.error("Error updating profile:", err);

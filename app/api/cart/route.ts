@@ -28,13 +28,13 @@ export async function GET() {
         const cartItem = JSON.parse(cartItemStr);
         cartItems.push(cartItem);
       } catch (error) {
-        console.error("❌ Error parsing cart item:", error);
+        console.error("Error parsing cart item:", error);
       }
     }
 
     return NextResponse.json({ cart: cartItems });
   } catch (error) {
-    console.error("❌ Error fetching cart:", error);
+    console.error("Error fetching cart:", error);
     return NextResponse.json({ cart: [] });
   }
 }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("❌ Error saving cart:", error);
+    console.error("Error saving cart:", error);
     return NextResponse.json({ error: "Failed to save cart" }, { status: 500 });
   }
 }
