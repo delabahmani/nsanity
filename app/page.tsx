@@ -1,10 +1,11 @@
+import FeaturedProducts from "@/components/Products/FeaturedProducts";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen nav-pad">
+    <div className="flex flex-col min-h-screen nav-pad bg-nsanity-cream/50">
       <section className="relative h-[80vh] flex items-center justify-center">
         <div className="relative z-10">
           <Image
@@ -25,6 +26,8 @@ export default function Home() {
           </span>
         </div>
       </section>
+
+      <FeaturedProducts />
     </div>
   );
 }

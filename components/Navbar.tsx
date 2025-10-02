@@ -12,6 +12,7 @@ import { Session } from "next-auth";
 import Button from "./ui/Button";
 
 export default function Navbar({ session }: { session: Session | null }) {
+  const pathname = usePathname();
   const [pop, setPop] = useState(false);
 
   const [cartOpen, setCartOpen] = useState(false);
@@ -50,6 +51,11 @@ export default function Navbar({ session }: { session: Session | null }) {
     { name: "about", href: "/about", current: path === "/about" },
     { name: "contact", href: "/contact", current: path === "/contact" },
   ];
+
+  const hideNavbar =
+    pathname?.startsWith("/auth") || pathname === "/reset-password";
+
+  if (hideNavbar) return null;
 
   return (
     <header className="bg-nsanity-cream/90 fixed w-full z-50 backdrop-blur-md drop-shadow-sm">

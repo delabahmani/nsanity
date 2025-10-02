@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function SignIn() {
   return (
-    <div className="flex min-h-screen w-full nav-padding">
+    <div className="flex min-h-screen w-full">
       <div className="max-lg:w-full flex items-center justify-center lg:w-2/3 h-full  ">
         <SignInForm />
       </div>
@@ -16,7 +16,7 @@ export default function SignIn() {
           alt="Background Image"
           fill
           priority
-          className="rounded-l-3xl object-cover"
+          className="object-cover"
           quality={100}
         />
       </div>
