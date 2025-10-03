@@ -48,12 +48,13 @@ export default function Navbar({ session }: { session: Session | null }) {
   const navigation = [
     { name: "home", href: "/", current: path === "/" },
     { name: "shop", href: "/products", current: path === "/products" },
-    { name: "about", href: "/about", current: path === "/about" },
     { name: "contact", href: "/contact", current: path === "/contact" },
   ];
 
   const hideNavbar =
-    pathname?.startsWith("/auth") || pathname === "/reset-password";
+    pathname?.startsWith("/auth") ||
+    pathname === "/reset-password" ||
+    pathname === "/contact";
 
   if (hideNavbar) return null;
 

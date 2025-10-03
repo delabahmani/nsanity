@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
+import Image from "next/image";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -56,131 +57,149 @@ export default function Contact() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen nav-pad bg-[#fffbf8]">
-      <div className="max-w-2xl mx-auto w-full px-4">
-        <h1 className="text-nsanity-black font-bold text-3xl text-center py-6">
-          contact us
-        </h1>
+    <div className="flex min-h-screen bg-[#fffbf8] w-full">
+      <div className="max-lg:w-full flex items-center justify-center lg:w-2/3 h-full p-6">
+        <div className="w-full max-w-md xl:max-w-xl">
+          <h1 className="text-nsanity-black font-bold text-3xl text-center py-4">
+            contact us
+          </h1>
 
-        {/* Quick help */}
-        <div className="bg-white rounded-lg p-6 mb-8 border border-nsanity-darkorange/20">
-          <h2 className="font-semibold mb-4 text-nsanity-darkorange">
-            Need quick help?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <h3 className="font-medium text-black mb-2">For Sellers:</h3>
-              <ul className="space-y-1 text-nsanity-black/75">
-                <li>• How to create products</li>
-                <li>• Design Canvas help</li>
-                <li>• Printful integration</li>
-                <li>• Store setup</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium text-black mb-2">For Buyers:</h3>
-              <ul className="space-y-1 text-nsanity-black/75">
-                <li>• Order tracking</li>
-                <li>• Size guides</li>
-                <li>• Returns & exchanges</li>
-                <li>• Payment issues</li>
-              </ul>
+          {/* Quick help */}
+          <div className="bg-white rounded-lg p-4 mb-6 border border-nsanity-darkorange/20">
+            <h2 className="font-semibold mb-3 text-nsanity-darkorange">
+              Need quick help?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h3 className="font-medium text-black mb-2">For Sellers:</h3>
+                <ul className="space-y-1 text-nsanity-black/75">
+                  <li>• How to create products</li>
+                  <li>• Design Canvas help</li>
+                  <li>• Printful integration</li>
+                  <li>• Store setup</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium text-black mb-2">For Buyers:</h3>
+                <ul className="space-y-1 text-nsanity-black/75">
+                  <li>• Order tracking</li>
+                  <li>• Size guides</li>
+                  <li>• Returns & exchanges</li>
+                  <li>• Payment issues</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Contact form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white rounded-lg p-6 border border-nsanity-darkorange/20"
-        >
-          <div className="space-y-4">
-            <div>
-              <label className="block font-medium mb-2">
-                What&apos;s this about?
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-                className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
-              >
-                <option value="general">General</option>
-                <option value="selling">Selling Help</option>
-                <option value="orders">Order Issue</option>
-                <option value="technical">Technical Problem</option>
-                <option value="business">Business Inquiry</option>
-                <option value="bug">Bug Report</option>
-              </select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Contact form */}
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white rounded-lg p-4 border border-nsanity-darkorange/20"
+          >
+            <div className="space-y-4">
               <div>
-                <label className="block font-medium mb-2">Name</label>
+                <label className="block font-medium mb-2">
+                  What&apos;s this about?
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
+                >
+                  <option value="general">General</option>
+                  <option value="selling">Selling Help</option>
+                  <option value="orders">Order Issue</option>
+                  <option value="technical">Technical Problem</option>
+                  <option value="business">Business Inquiry</option>
+                  <option value="bug">Bug Report</option>
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-medium mb-2">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Your Name"
+                    className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Your Email"
+                    className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-medium mb-2">Subject</label>
                 <input
                   type="text"
-                  name="name"
-                  placeholder="Your Name"
+                  name="subject"
+                  placeholder="Brief description of your issue"
                   className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
-                  value={formData.name}
+                  value={formData.subject}
                   onChange={handleChange}
                   required
                 />
               </div>
+
               <div>
-                <label className="block font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email"
+                <label className="block font-medium mb-2">Message</label>
+                <textarea
+                  name="message"
+                  placeholder="Describe your question or issue in detail..."
+                  rows={4}
                   className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
-                  value={formData.email}
+                  value={formData.message}
                   onChange={handleChange}
                   required
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block font-medium mb-2">Subject</label>
-              <input
-                type="text"
-                name="subject"
-                placeholder="Brief description of your issue"
-                className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-              />
+              <Button
+                type="submit"
+                className={`${isSubmitting ? "bg-nsanity-darkorange" : ""} w-full`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Sending..." : "Send Message"}
+              </Button>
             </div>
+          </form>
 
-            <div>
-              <label className="block font-medium mb-2">Message</label>
-              <textarea
-                name="message"
-                placeholder="Describe your question or issue in detail..."
-                rows={6}
-                className="w-full p-3 border border-nsanity-darkorange rounded-md focus:outline-none focus:ring-2 focus:ring-nsanity-darkorange/50"
-                value={formData.message}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <Button type="submit" className={`${isSubmitting ? "bg-nsanity-darkorange" : ""} w-full`} disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : "Send Message"}
-            </Button>
+          <div className="text-center mt-4 text-sm text-nsanity-black/75">
+            <p>We typically respond within 24 hours</p>
+            <p>
+              For urgent issues, expect a response within 4 hours during
+              business days
+            </p>
           </div>
-        </form>
-
-        <div className="text-center mt-6 text-sm text-nsanity-black/75">
-          <p>We typically respond within 24 hours</p>
-          <p>
-            For urgent issues, expect a response within 4 hours during business
-            days
-          </p>
         </div>
+      </div>
+
+      {/* Image Section */}
+      <div className="relative max-lg:hidden w-full">
+        <Image
+          src={"/images/bg-1.webp"}
+          alt="Background image"
+          fill
+          priority
+          className="object-cover"
+          quality={100}
+        />
       </div>
     </div>
   );
