@@ -4,10 +4,13 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { printfulService } from "@/lib/printful-service";
 import prisma from "@/lib/prismadb";
 import Stripe from "stripe";
+import { UTApi } from "uploadthing/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-04-30.basil",
 });
+
+const utapi = new UTApi();
 
 export async function POST(
   req: NextRequest,
@@ -45,11 +48,11 @@ export async function POST(
     }
 
     // Fetch mockups from Printful with polling (waits up to 60 seconds)
-    const mockups = await printfulService.generateProductMockups(
+    const printfulMockups = await printfulService.generateProductMockups(
       product.printfulSyncProductId
     );
 
-    if (mockups.length === 0) {
+    if (printfulMockups.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -59,24 +62,74 @@ export async function POST(
       );
     }
 
-    // Update product in database with new mockup images
+    console.log(
+      `Downloading ${printfulMockups.length} mockups from Printful...`
+    );
+
+    // Download each mockup and re-upload to UploadThing
+    const permanentUrls: string[] = [];
+
+    for (let i = 0; i < printfulMockups.length; i++) {
+      const mockupUrl = printfulMockups[i];
+
+      try {
+        // Download image from Printful's temp URL
+        const response = await fetch(mockupUrl);
+
+        if (!response.ok) {
+          console.error(`Failed to download mockup ${i}: ${response.status}`);
+          continue;
+        }
+
+        const blob = await response.blob();
+        const file = new File([blob], `product-${productId}-mockup-${i}.jpg`, {
+          type: "image/jpeg",
+        });
+
+        // Upload to UploadThing
+        console.log(
+          `Uploading mockup ${i + 1}/${printfulMockups.length} to UploadThing...`
+        );
+        const uploadResult = await utapi.uploadFiles([file]);
+
+        if (uploadResult[0]?.data?.url) {
+          permanentUrls.push(uploadResult[0].data.url);
+          console.log(`✓ Mockup ${i + 1} uploaded successfully`);
+        } else {
+          console.error(`Failed to upload mockup ${i} to UploadThing`);
+        }
+      } catch (error) {
+        console.error(`Error processing mockup ${i}:`, error);
+      }
+    }
+
+    if (permanentUrls.length === 0) {
+      return NextResponse.json(
+        { error: "Failed to upload mockups to UploadThing" },
+        { status: 500 }
+      );
+    }
+
+    console.log(`Successfully uploaded ${permanentUrls.length} mockups`);
+
+    // Update product in database with permanent UploadThing URLs
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
-        images: mockups,
+        images: permanentUrls,
       },
     });
 
     // Update Stripe product with new mockup images
     if (product.stripeProductId) {
       await stripe.products.update(product.stripeProductId, {
-        images: mockups.slice(0, 8), // Stripe allows max 8 images
+        images: permanentUrls.slice(0, 8), // Stripe allows max 8 images
       });
     }
 
     return NextResponse.json({
       success: true,
-      mockups,
+      mockups: permanentUrls,
       product: updatedProduct,
     });
   } catch (error) {

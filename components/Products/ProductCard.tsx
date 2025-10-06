@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useFavorites } from "../FavoritesContext";
 
 interface ProductCardProps {
   product: Product;
@@ -47,28 +48,14 @@ const mapColorToCss = (color: string): string => {
 export default function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
   const router = useRouter();
+  const {favorites, refreshFavorites} = useFavorites();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!session) return;
-
-    const checkFavorite = async () => {
-      try {
-        const res = await fetch("/api/user/favorites");
-        if (res.ok) {
-          const data = await res.json();
-          const favorites = data.products || [];
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setIsFavorited(favorites.some((fav: any) => fav.id === product.id));
-        }
-      } catch (error) {
-        console.error("Error checking favorites: ", error);
-      }
-    };
-
-    checkFavorite();
-  }, [session, product.id]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setIsFavorited(favorites.some((fav: any) => fav.id === product.id));
+  }, [favorites, product.id])
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -89,6 +76,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       if (res.ok) {
         setIsFavorited(!isFavorited);
+        refreshFavorites();
         toast.success(
           isFavorited ? "Removed from favorites" : "Added to favorites!"
         );

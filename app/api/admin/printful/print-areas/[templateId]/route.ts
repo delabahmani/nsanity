@@ -82,7 +82,19 @@ export async function GET(
             templateHeight: frontTemplate.template_height,
           },
         ]
-      : [];
+      : [
+          {
+            id: 1,
+            title: "Front",
+            template_url: product?.image || "",
+            width: 1200,
+            height: 1600,
+            left: 900,
+            top: 800,
+            templateWidth: 3000,
+            templateHeight: 3000,
+          },
+        ];
 
     return NextResponse.json({
       success: true,

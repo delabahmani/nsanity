@@ -193,7 +193,7 @@ export default function Contact() {
       {/* Image Section */}
       <div className="relative max-lg:hidden w-full">
         <Image
-          src={"/images/bg-1.webp"}
+          src={"/images/bg-2.png"}
           alt="Background image"
           fill
           priority

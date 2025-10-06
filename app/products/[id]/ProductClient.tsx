@@ -17,6 +17,7 @@ type ProductClientProps = {
 export default function ProductClient({ product }: ProductClientProps) {
   const { data: session } = useSession();
   const { addToCart } = useCart();
+  const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     undefined
@@ -144,9 +145,9 @@ export default function ProductClient({ product }: ProductClientProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <ProductCarousel images={product.images} productName={product.name} />
           <div className="space-y-6">
-            <div>
+            <div className="space-y-3">
               <h1 className="text-3xl font-bold text-black">{product.name}</h1>
-              <p className="text-2xl font-semibold text-nsanity-darkorange">
+              <p className="text-2xl font-bold text-nsanity-darkorange">
                 ${product.price.toFixed(2)}
               </p>
             </div>
@@ -213,10 +214,11 @@ export default function ProductClient({ product }: ProductClientProps) {
             </div>
 
             {/* Add to Cart */}
-            <div className="flex space-x-4 pt-6">
+            <div className="flex space-x-4 pt-6 items-center">
               <Button
                 className="gap-3"
                 variant="primary"
+                size="xl"
                 onClick={handleAddToCart}
               >
                 <ShoppingBag size={20} />
@@ -225,7 +227,8 @@ export default function ProductClient({ product }: ProductClientProps) {
 
               {/* Favorite Button */}
               <Button
-                variant="ghost"
+                variant="default"
+                size="lg"
                 onClick={handleToggleFavorite}
                 disabled={favoritesLoading}
                 className={`${isFavorited ? "text-red-500" : "text-gray-500"} transition-colors`}
@@ -236,6 +239,63 @@ export default function ProductClient({ product }: ProductClientProps) {
                 />
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div className="mt-12 border-t border-nsanity-gray pt-8">
+          <div className="flex space-x-8 border-b border-nsanity-gray">
+            <button
+              onClick={() => setActiveTab("details")}
+              className={`p-4 text-lg font-medium transition-colors ${activeTab === "details" ? "text-nsanity-darkorange border-b-2 border-nsanity-darkorange" : "text-gray-500 hover:text-gray-700"}`}
+            >
+              Details
+            </button>
+            <button
+              onClick={() => setActiveTab("shipping")}
+              className={`p-4 text-lg font-medium transition-colors ${
+                activeTab === "shipping"
+                  ? "text-nsanity-darkorange border-b-2 border-nsanity-darkorange"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Shipping
+            </button>
+          </div>
+
+          <div className="mt-6">
+            {activeTab === "details" && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-nsanity-black">
+                  Product Details
+                </h3>
+                <ul className="space-y-2 text-gray-700">
+                  {product.features && product.features.length > 0 ? (
+                    product.features.map((feature, i) => (
+                      <li key={i} className="flex items-start">
+                        <span className="text-nsanity-darkorange mr-2">•</span>
+                        {feature}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-500">No features available.</li>
+                  )}
+                </ul>
+              </div>
+            )}
+
+            {activeTab === "shipping" && (
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-nsanity-black">
+                  Shipping Information
+                </h3>
+                <p className="text-gray-700">
+                  Free standard shipping on orders over $75. Express shipping
+                  available at checkout. Orders typically ship within 1-2
+                  business days.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

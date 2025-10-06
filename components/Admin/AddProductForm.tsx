@@ -66,9 +66,9 @@ interface PrintfulVariantsData {
 const PRINTFUL_TEMPLATES = [
   { id: 438, name: "Unisex T-Shirt" },
   { id: 146, name: "Unisex Hoodie" },
-  { id: 70, name: "Tank Top" },
+  { id: 365, name: "Unisex Muscle Tee" },
   { id: 145, name: "Unisex Crew Neck Sweatshirt" },
-  { id: 420, name: "Unisex Hat" },
+  { id: 662, name: "Vintage Corduroy Cap" },
 ];
 
 export default function AddProductContainer() {
@@ -644,10 +644,10 @@ export default function AddProductContainer() {
                         productMockup={mockupUrl ?? selectedTemplate.image}
                         uploadedDesign={designFile}
                         printArea={{
-                          x: printAreas[0].left || 1009,
-                          y: printAreas[0].top || 478,
-                          width: printAreas[0].width || 1001,
-                          height: printAreas[0].height || 1335,
+                          x: printAreas[0].left ?? 0,
+                          y: printAreas[0].top ?? 0,
+                          width: printAreas[0].width,
+                          height: printAreas[0].height,
                         }}
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         onDesignUpdate={(designData: any) => {

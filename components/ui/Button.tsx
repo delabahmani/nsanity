@@ -40,7 +40,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       size === "default" && "h-10 px-4 py-2",
       size === "sm" && "h-9 px-3 text-sm rounded-md",
       size === "lg" && "h-11 px-8 rounded-md",
-      size === "xl" && "h-12 text-lg w-40 text-md px-8 rounded-md",
+      size === "xl" && "h-11 text-lg w-62 text-md px-8 rounded-md",
       size === "icon" && "h-10 w-10",
       className
     );

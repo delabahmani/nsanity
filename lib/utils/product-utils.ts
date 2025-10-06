@@ -13,6 +13,7 @@ export type Product = {
   isFeatured: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  features: string[];
 };
 
 // Helper function to get product by ID
