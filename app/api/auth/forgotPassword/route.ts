@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   });
 
   // Send email with reset link
-  const resetUrl = `${BASE_URL}/reset-password?token=${token}`;
+  const resetUrl = `${BASE_URL}/resetPassword?token=${token}`;
   await resend.emails.send({
     from: "no-reply@nsanity.shop",
     to: email,

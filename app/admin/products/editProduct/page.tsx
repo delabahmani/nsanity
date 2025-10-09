@@ -90,11 +90,11 @@ export default function EditProductPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 nav-pad">
-      <div className="flex justify-between items-center mb-8">
+    <div className="container mx-auto px-4 nav-pad">
+      <div className="flex justify-between items-center mb-8 py-10">
         <h1 className="text-3xl font-bold">Edit Products</h1>
         <Button
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push("/admin")}
           className="bg-nsanity-darkorange text-white"
         >
           Back to Dashboard

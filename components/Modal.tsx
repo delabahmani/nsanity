@@ -141,7 +141,7 @@ export default function Modal({
 
         {showCloseButton && (
           <button
-            className="absolute top-4 right-5 w-10 h-10 rounded-full hover:bg-gray-200 hover:cursor-pointer transition-colors flex items-center justify-center z-20 disabled:opacity-50"
+            className="absolute top-4 left-5 w-10 h-10 rounded-full hover:bg-gray-200 hover:cursor-pointer transition-colors flex items-center justify-center z-20 disabled:opacity-50"
             onClick={handleClose}
             onMouseDown={(e) => e.stopPropagation()} // Prevent event bubbling
             onMouseUp={(e) => e.stopPropagation()} // Prevent event bubbling

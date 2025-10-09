@@ -141,7 +141,7 @@ export default function DeleteProductPage() {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-red-500 mb-4">{error}</p>
         <Button
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push("/admin")}
           className="bg-nsanity-darkorange text-white"
         >
           Back to Products
@@ -155,7 +155,7 @@ export default function DeleteProductPage() {
       <div className="flex justify-between items-center py-4 mb-8">
         <h1 className="text-3xl font-bold">Delete Products</h1>
         <Button
-          onClick={() => router.push("/admin/products")}
+          onClick={() => router.push("/admin")}
           className="bg-nsanity-darkorange text-white"
         >
           Back to Dashboard

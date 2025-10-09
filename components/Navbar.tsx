@@ -53,7 +53,7 @@ export default function Navbar({ session }: { session: Session | null }) {
 
   const hideNavbar =
     pathname?.startsWith("/auth") ||
-    pathname === "/reset-password" ||
+    pathname === "/resetPassword" ||
     pathname === "/contact";
 
   if (hideNavbar) return null;

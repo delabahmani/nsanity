@@ -85,7 +85,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
               onClick={handleMenuClick}
             >
-              Settings
+              <Link href="/profile?tab=settings">Settings</Link>
             </li>
             <li
               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"

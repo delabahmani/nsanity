@@ -57,7 +57,7 @@ export default function ProfileSettings() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/change-password", {
+      const response = await fetch("/api/auth/changePassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -135,10 +135,6 @@ export default function ProfileSettings() {
     router.push("/contact");
   };
 
-  const handleSizeGuide = () => {
-    router.push("/size-guide");
-  };
-
   const handleReturnPolicy = () => {
     router.push("/return-policy");
   };
@@ -204,12 +200,7 @@ export default function ProfileSettings() {
           >
             Contact Support
           </Button>
-          <Button
-            className="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-            onClick={handleSizeGuide}
-          >
-            Size Guide
-          </Button>
+
           <Button
             className="w-full text-left px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             onClick={handleReturnPolicy}

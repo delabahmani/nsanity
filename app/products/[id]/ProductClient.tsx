@@ -9,6 +9,8 @@ import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Product } from "@/lib/utils/product-utils";
+import SizeGuideModal from "@/components/Products/SizeGuideModal";
+import { pickGuideCategory } from "@/lib/printful-features";
 
 type ProductClientProps = {
   product: Product;
@@ -27,6 +29,8 @@ export default function ProductClient({ product }: ProductClientProps) {
   );
   const [isFavorited, setIsFavorited] = useState(false);
   const [favoritesLoading, setFavoritesLoading] = useState(false);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
+  const guideCategory = pickGuideCategory(product.categories || []) ?? "tshirt";
 
   // Check if product is favorited on mount
   useEffect(() => {
@@ -184,7 +188,17 @@ export default function ProductClient({ product }: ProductClientProps) {
 
             {/* Sizes */}
             <div>
-              <h3 className="text-lg font-medium mb-3">Sizes</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-medium">Sizes</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowSizeGuide(true)}
+                  className="ml-2"
+                >
+                  Size Guide
+                </Button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size: string) => (
                   <Button
@@ -201,6 +215,13 @@ export default function ProductClient({ product }: ProductClientProps) {
                 ))}
               </div>
             </div>
+            {showSizeGuide && (
+              <SizeGuideModal
+                category={guideCategory}
+                isOpen={showSizeGuide}
+                onClose={() => setShowSizeGuide(false)}
+              />
+            )}
 
             {/* Quantity Selector */}
             <div>

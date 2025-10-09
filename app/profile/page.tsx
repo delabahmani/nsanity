@@ -9,6 +9,7 @@ import ProfileFavorites from "@/components/Profile/ProfileFavorites";
 import ProfileOrders from "@/components/Profile/ProfileOrders";
 import ProfileSettings from "@/components/Profile/ProfileSettings";
 import toast from "react-hot-toast";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface UserProfile {
   id: string;
@@ -142,7 +143,7 @@ export default function ProfilePage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <LoadingSpinner size="large" />
         <p className="mt-4 text-gray-600">Loading profile...</p>
       </div>
     );
@@ -181,7 +182,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center">
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-5xl lg:py-10 py-4">
         <ProfileHeader
           name={userInfo.name}
           isEditing={isEditing}

@@ -143,7 +143,7 @@ export default function EditProductForm({
       if (onSuccess) {
         onSuccess();
       } else {
-        router.push("/admin/products");
+        router.push("/admin");
         router.refresh();
       }
     } catch (error) {
