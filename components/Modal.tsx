@@ -153,7 +153,7 @@ export default function Modal({
           </button>
         )}
 
-        <div className="p-6">{children}</div>
+        <div className="p-10">{children}</div>
       </div>
     </div>,
     document.body

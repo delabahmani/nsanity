@@ -1,5 +1,5 @@
 "use client";
-import { ShoppingBasket } from "lucide-react";
+import { ShoppingBasket, ShoppingCart, X } from "lucide-react";
 import { useCart } from "./CartContext";
 import QuantitySelector from "./Products/QuantitySelector";
 import Image from "next/image";
@@ -22,6 +22,10 @@ export default function Navbar({ session }: { session: Session | null }) {
   const path = usePathname();
   const prevCount = useRef(0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   useEffect(() => {
     if (cartCount !== prevCount.current) {
@@ -104,6 +108,7 @@ export default function Navbar({ session }: { session: Session | null }) {
               </Link>
             )}
 
+            {/* Mini Cart */}
             <div className="relative">
               <Button
                 className="text-sm font-semibold leading-6 text-nsanity-black relative"
@@ -111,7 +116,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                   e.preventDefault();
                   setCartOpen((open) => !open);
                 }}
-                aria-label="Open Cart"
+                aria-label="Open cart"
                 variant="ghost"
               >
                 <ShoppingBasket className="link-hover" size={28} />
@@ -129,114 +134,157 @@ export default function Navbar({ session }: { session: Session | null }) {
               {cartOpen && (
                 <div
                   ref={cartRef}
-                  className="lg:min-w-[400px] max-w-[300px] min-w-80 bg-nsanity-cream absolute right-0 mt-2 max-h-[500px] shadow-md rounded-lg z-50 border-2 border-nsanity-darkorange"
+                  className="absolute right-0 mt-3 w-[420px] max-w-[90vw] z-50"
                 >
-                  <div className="p-3 border-b-2 border-b-nsanity-darkorange font-semibold text-lg flex justify-between items-center">
-                    cart
-                    <span className="text-sm text-black/80">
-                      {cart.length} item{cart.length !== 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  {cart.length === 0 ? (
-                    <div className="p-3  font-semibold text-center text-black ">
-                      your cart is empty!
-                    </div>
-                  ) : (
-                    <div className="p-2">
-                      {cart.map((item) => (
-                        <div
-                          key={
-                            item.productId +
-                            (item.size ?? "") +
-                            (item.color ?? "")
-                          }
-                          className=""
-                        >
-                          <div className="flex items-center gap-3">
-                            <Image
-                              src={item.image || "/images/placeholder.webp"}
-                              alt={item.name}
-                              width={100}
-                              height={100}
-                              quality={100}
-                              className="rounded border lg:w-20 lg:h-20 object-cover"
-                            />
+                  {/* Pointer */}
+                  <div className="absolute right-[22px] -top-2 h-4 w-4 rotate-45 bg-white border border-nsanity-gray/40 shadow-sm" />
 
-                            <div>
-                              <p className="font-semibold">{item.name}</p>
-                              <p>
-                                size: {item.size || "-"} | color:{" "}
-                                {item.color || "-"}
-                              </p>
-
-                              <div className="flex items-center gap-2">
-                                <QuantitySelector
-                                  initialValue={item.quantity}
-                                  min={1}
-                                  max={10}
-                                  size="sm"
-                                  onChange={(newQuantity) =>
-                                    updateQuantity(
-                                      item.productId,
-                                      newQuantity,
-                                      item.size,
-                                      item.color
-                                    )
-                                  }
-                                />
-                                <Button
-                                  className="ml-2 flex items-center justify-center"
-                                  onClick={() =>
-                                    removeFromCart(
-                                      item.productId,
-                                      item.size,
-                                      item.color
-                                    )
-                                  }
-                                  aria-label="Remove Item"
-                                  variant="ghost"
-                                >
-                                  <Trash2
-                                    size={25}
-                                    className="text-nsanity-black/65 hover:text-nsanity-red"
-                                  />
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="">
-                            <p>${(item.price * item.quantity).toFixed(2)}</p>
-                          </div>
-                        </div>
-                      ))}
-
-                      <div className="p-3 flex justify-between items-center font-semibold border-t-2 border-t-nsanity-darkorange ">
-                        <h2 className="">subtotal</h2>
-                        <span>
-                          ${" "}
-                          {cart
-                            .reduce(
-                              (sum, item) => sum + item.price * item.quantity,
-                              0
-                            )
-                            .toFixed(2)}
+                  <div className="relative rounded-2xl border border-nsanity-gray/40 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-nsanity-gray/30 bg-nsanity-cream/60">
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart
+                          size={18}
+                          className="text-nsanity-black/80"
+                        />
+                        <span className="font-semibold">Your cart</span>
+                        <span className="ml-2 text-xs bg-nsanity-cream text-nsanity-black/70 px-2 py-0.5 rounded-full">
+                          {cartCount} {cartCount === 1 ? "item" : "items"}
                         </span>
                       </div>
+                      <button
+                        aria-label="Close cart"
+                        onClick={() => setCartOpen(false)}
+                        className="p-1.5 rounded-md hover:bg-nsanity-cream transition"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
 
-                      <div>
-                        <Link href={"/cart"}>
-                          <Button
-                            variant="primary"
-                            className="w-full hover:scale-[101%]"
-                            size="sm"
-                          >
-                            Checkout
+                    {/* Items */}
+                    {cart.length === 0 ? (
+                      <div className="px-6 py-10 text-center flex flex-col items-center justify-center">
+                        <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-nsanity-cream flex items-center justify-center">
+                          <ShoppingCart
+                            size={18}
+                            className="text-nsanity-black/70"
+                          />
+                        </div>
+                        <p className="font-semibold">Your cart is empty</p>
+                        <p className="text-sm text-nsanity-black/70 mt-1">
+                          Start adding products to see them here.
+                        </p>
+                        <Link
+                          href="/products"
+                          onClick={() => setCartOpen(false)}
+                        >
+                          <Button variant="primary" size="sm" className="mt-4">
+                            Browse products
                           </Button>
                         </Link>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      <>
+                        <div className="max-h-80 overflow-y-auto px-4 py-3 divide-y divide-gray-100">
+                          {cart.map((item) => (
+                            <div
+                              key={
+                                item.productId +
+                                (item.size ?? "") +
+                                (item.color ?? "")
+                              }
+                              className="py-3 first:pt-0 last:pb-0"
+                            >
+                              <div className="grid grid-cols-[64px_1fr_auto] gap-3 items-start">
+                                <div className="h-16 w-16 rounded-lg overflow-hidden border bg-nsanity-cream">
+                                  <Image
+                                    src={
+                                      item.image || "/images/placeholder.webp"
+                                    }
+                                    alt={item.name}
+                                    width={64}
+                                    height={64}
+                                    quality={100}
+                                    className="h-full w-full object-cover"
+                                  />
+                                </div>
+
+                                <div className="min-w-0">
+                                  <p className="font-semibold truncate">
+                                    {item.name}
+                                  </p>
+                                  <p className="text-sm text-nsanity-black/70">
+                                    Size: {item.size || "-"} • Color:{" "}
+                                    {item.color || "-"}
+                                  </p>
+
+                                  <div className="mt-2 flex items-center gap-2">
+                                    <QuantitySelector
+                                      initialValue={item.quantity}
+                                      min={1}
+                                      max={10}
+                                      size="sm"
+                                      onChange={(q) =>
+                                        updateQuantity(
+                                          item.productId,
+                                          q,
+                                          item.size,
+                                          item.color
+                                        )
+                                      }
+                                    />
+                                    <button
+                                      className="p-2 rounded-md hover:bg-nsanity-cream transition"
+                                      onClick={() =>
+                                        removeFromCart(
+                                          item.productId,
+                                          item.size,
+                                          item.color
+                                        )
+                                      }
+                                      aria-label="Remove item"
+                                      title="Remove"
+                                    >
+                                      <Trash2
+                                        size={18}
+                                        className="text-nsanity-black/65 hover:text-nsanity-red"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                <div className="text-right">
+                                  <div className="font-semibold">
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Footer / Summary */}
+                        <div className="px-4 py-4 border-t border-nsanity-gray/30 bg-white sticky bottom-0">
+                          <div className="flex items-center justify-between text-sm mb-3">
+                            <span className="text-nsanity-black/70">
+                              Subtotal
+                            </span>
+                            <span className="font-semibold">
+                              ${subtotal.toFixed(2)}
+                            </span>
+                          </div>
+                          <Link
+                            href={"/cart"}
+                            onClick={() => setCartOpen(false)}
+                          >
+                            <Button variant="primary" className="w-full">
+                              Proceed to checkout
+                            </Button>
+                          </Link>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

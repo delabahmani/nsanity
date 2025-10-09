@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
@@ -33,7 +33,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
   const handleMenuClick = () => setIsOpen(false);
 
   return (
-    <div className="relative">
+    <div className="relative hover:cursor-pointer">
       <div>
         {user?.image ? (
           <Image
@@ -55,50 +55,102 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute top-5 right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-50 text-center"
+          className="absolute -right-0 mt-4 md:w-64 z-50"
+          role="menu"
+          aria-label="Profile menu"
+          onClick={handleMenuClick}
         >
-          <ul
-            className="py-1"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="user-menu-button"
-          >
-            <li
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-              onClick={handleMenuClick}
-            >
-              <Link href="/profile" className="block w-full h-full">
-                Profile
-              </Link>
-            </li>
-            {user?.isAdmin && (
-              <li
-                className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                onClick={handleMenuClick}
-              >
-                <Link href="/admin" className="block w-full h-full">
-                  Admin
+          {/* Pointer */}
+          <div className="absolute right-2 -top-2 h-4 w-4 rotate-45 bg-white border border-nsanity-gray/40 shadow-sm" />
+
+          <div className="relative rounded-2xl border border-nsanity-gray/40 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+            {/* Header strip */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-nsanity-gray/30 bg-nsanity-cream/60">
+              {user?.image ? (
+                <Image
+                  src={user.image}
+                  alt="Profile"
+                  width={36}
+                  height={36}
+                  className="rounded-full h-9 w-9 object-cover"
+                />
+              ) : (
+                <div className="h-9 w-9 rounded-full bg-nsanity-cream flex items-center justify-center">
+                  <User size={18} className="text-nsanity-black/70" />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="font-semibold truncate">
+                  {user?.name || user?.email || "Account"}
+                </p>
+                {user?.email && (
+                  <p className="text-xs text-nsanity-black/70 truncate">
+                    {user.email}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Items */}
+            <ul className="py-2">
+              <li>
+                <Link
+                  href="/profile"
+                  onClick={close}
+                  className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
+                  role="menuitem"
+                >
+                  <User size={16} className="text-nsanity-black/70" />
+                  <span>Profile</span>
                 </Link>
               </li>
-            )}
-            <li
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-              onClick={handleMenuClick}
-            >
-              <Link href="/profile?tab=settings">Settings</Link>
-            </li>
-            <li
-              className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-              onClick={() => {
-                setIsOpen(false);
-                clearCart();
-                signOut({ callbackUrl: "/" });
-              }}
-              aria-label="Sign out"
-            >
-              Sign Out
-            </li>
-          </ul>
+
+              {user?.isAdmin && (
+                <li>
+                  <Link
+                    href="/admin"
+                    onClick={close}
+                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
+                    role="menuitem"
+                  >
+                    <LayoutDashboard
+                      size={16}
+                      className="text-nsanity-black/70"
+                    />
+                    <span>Admin</span>
+                  </Link>
+                </li>
+              )}
+
+              <li>
+                <Link
+                  href="/profile?tab=settings"
+                  onClick={close}
+                  className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
+                  role="menuitem"
+                >
+                  <Settings size={16} className="text-nsanity-black/70" />
+                  <span>Settings</span>
+                </Link>
+              </li>
+
+              <li>
+                <button
+                  onClick={() => {
+                    close();
+                    clearCart();
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:cursor-pointer hover:bg-nsanity-cream/50 transition"
+                  aria-label="Sign out"
+                  role="menuitem"
+                >
+                  <LogOut size={16} className="text-nsanity-black/70" />
+                  <span>Sign out</span>
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       )}
     </div>
