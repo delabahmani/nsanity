@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/utils/product-utils";
+import { mapColorToCss, Product } from "@/lib/utils/product-utils";
 import { Heart } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -14,48 +14,18 @@ interface ProductCardProps {
   product: Product;
 }
 
-const mapColorToCss = (color: string): string => {
-  const colorMap: Record<string, string> = {
-    Ash: "#B2BEB5",
-    Black: "black",
-    "Carolina Blue": "#4B9CD3",
-    Charcoal: "dimgray",
-    "Dark Chocolate": "saddlebrown",
-    "Dark Heather": "darkgray",
-    "Forest Green": "forestgreen",
-    Gold: "gold",
-    "Graphite Heather": "gray",
-    "Heather Deep Royal": "#4169E1",
-    Heliconia: "hotpink",
-    "Indigo Blue": "indigo",
-    "Irish Green": "green",
-    "Light Blue": "lightblue",
-    "Light Pink": "lightpink",
-    Maroon: "maroon",
-    "Military Green": "darkolivegreen",
-    Navy: "navy",
-    Orange: "orange",
-    Purple: "purple",
-    Red: "red",
-    Royal: "royalblue",
-    Sand: "sandybrown",
-    "Sport Grey": "lightgray",
-    White: "white",
-  };
-  return colorMap[color] || "#D3D3D3";
-};
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { data: session } = useSession();
   const router = useRouter();
-  const {favorites, refreshFavorites} = useFavorites();
+  const { favorites, refreshFavorites } = useFavorites();
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setIsFavorited(favorites.some((fav: any) => fav.id === product.id));
-  }, [favorites, product.id])
+  }, [favorites, product.id]);
 
   const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -107,6 +77,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         )}
       </button>
+
+      {product.isFeatured && (
+        <div className="absolute top-3 left-2 z-10 bg-nsanity-darkorange text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+          Featured
+        </div>
+      )}
 
       <div className="bg-nsanity-cream rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl">
         <div className="relative h-96 w-full bg-[#FFFFFF] flex items-center justify-center p-6">

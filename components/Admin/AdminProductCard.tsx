@@ -1,4 +1,4 @@
-import { Product } from "@/lib/utils/product-utils";
+import { mapColorToCss, Product } from "@/lib/utils/product-utils";
 import Image from "next/image";
 import Button from "../ui/Button";
 
@@ -26,7 +26,7 @@ export default function AdminProductCard({
         />
 
         {product.isFeatured && (
-          <div className="absolute top-2 left-2 bg-nsanity-darkorange text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+          <div className="absolute top-3 left-2 bg-nsanity-darkorange text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
             Featured
           </div>
         )}
@@ -49,7 +49,7 @@ export default function AdminProductCard({
             <div
               key={color}
               className="w-4 h-4 rounded-full border border-gray-300"
-              style={{ backgroundColor: color.toLowerCase() }}
+              style={{ backgroundColor: mapColorToCss(color) }}
               aria-label={color}
             />
           ))}

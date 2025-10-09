@@ -56,20 +56,34 @@ export async function getAllProducts(): Promise<Product[]> {
   }
 }
 
-// Helper function to get featured products
-// export async function getFeaturedProducts(): Promise<Product[]> {
-//   try {
-//     const res = await fetch("/api/products?featured=true", {
-//       cache: "no-store",
-//     });
+export const COLOR_HEX_MAP: Record<string, string> = {
+  Ash: "#B2BEB5",
+  Black: "black",
+  "Carolina Blue": "#4B9CD3",
+  Charcoal: "dimgray",
+  "Dark Chocolate": "saddlebrown",
+  "Dark Heather": "darkgray",
+  "Forest Green": "forestgreen",
+  Gold: "gold",
+  "Graphite Heather": "gray",
+  "Heather Deep Royal": "#4169E1",
+  Heliconia: "hotpink",
+  "Indigo Blue": "indigo",
+  "Irish Green": "green",
+  "Light Blue": "lightblue",
+  "Light Pink": "lightpink",
+  Maroon: "maroon",
+  "Military Green": "darkolivegreen",
+  Navy: "navy",
+  Orange: "orange",
+  Purple: "purple",
+  Red: "red",
+  Royal: "royalblue",
+  Sand: "sandybrown",
+  "Sport Grey": "lightgray",
+  White: "white",
+};
 
-//     if (!res.ok) {
-//       throw new Error(`Failed to fetch featured products: ${res.statusText}`);
-//     }
-
-//     return await res.json();
-//   } catch (error) {
-//     console.error("Error fetching featured products:", error);
-//     return [];
-//   }
-// }
+export function mapColorToCss(color: string): string {
+  return COLOR_HEX_MAP[color] ?? "#D3D3D3";
+}
