@@ -1,3 +1,4 @@
+import { getProductFeatures } from "../printful-features";
 import prisma from "../prismadb";
 
 export type Product = {
@@ -11,6 +12,7 @@ export type Product = {
   sizes: string[];
   inStock: boolean;
   isFeatured: boolean;
+  printfulTemplateId: number | null;
   createdAt?: Date;
   updatedAt?: Date;
   features: string[];
@@ -22,7 +24,14 @@ export async function getProductById(id: string): Promise<Product | null> {
     const product = await prisma.product.findUnique({
       where: { id },
     });
-    return product as Product | null;
+    if (!product) return null;
+
+    return {
+      ...product,
+      features: product.printfulTemplateId
+        ? getProductFeatures(product.printfulTemplateId)
+        : [],
+    } as Product;
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
@@ -44,12 +53,18 @@ export async function getAllProducts(): Promise<Product[]> {
         sizes: true,
         inStock: true,
         isFeatured: true,
+        printfulTemplateId: true,
         createdAt: true,
         updatedAt: true,
       },
       orderBy: { createdAt: "desc" },
     });
-    return products as Product[];
+    return products.map((p) => ({
+      ...p,
+      features: p.printfulTemplateId
+        ? getProductFeatures(p.printfulTemplateId)
+        : [],
+    })) as Product[];
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
