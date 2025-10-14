@@ -53,7 +53,7 @@ export default function ProductCarousel({
             src={images[currentImageIndex] || "/images/placeholder.webp"}
             alt={productName}
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             quality={100}
           />
@@ -81,7 +81,7 @@ export default function ProductCarousel({
                 src={image}
                 alt={`${productName} view ${i + 1}`}
                 fill
-                className={`object-cover cursor-pointer hover:opacity-80 transition-opacity duration-300 ${
+                className={`object-contain cursor-pointer hover:opacity-80 transition-opacity duration-300 ${
                   currentImageIndex === i ? "opacity-90" : ""
                 }`}
               />
