@@ -159,13 +159,13 @@ export default function ProductClient({ product }: ProductClientProps) {
 
             {/* Colors */}
             <div className="flex mt-3 space-x-2">
-              {product.colors.slice(0, 3).map((color: string) => (
+              {product.colors.map((color: string) => (
                 <Button
                   key={color}
-                  className={`w-4 h-4 rounded-full border border-gray-300 ${
+                  className={`w-4 h-4 rounded-full shadow-md ${
                     selectedColor === color
                       ? "border-nsanity-darkorange border-2"
-                      : "border-none"
+                      : " border-[.5px] border-gray-400"
                   }`}
                   style={{ backgroundColor: mapColorToCss(color) }}
                   title={color}
@@ -173,11 +173,6 @@ export default function ProductClient({ product }: ProductClientProps) {
                   onClick={() => setSelectedColor(color)}
                 />
               ))}
-              {product.colors.length > 3 && (
-                <span className="text-xs text-black/70 ml-1">
-                  {product.colors.length - 3} more
-                </span>
-              )}
             </div>
             {selectedColor && (
               <p className="text-sm text-nsanity-black/70 mt-2">
