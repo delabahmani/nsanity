@@ -27,11 +27,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
+        <Toaster position="top-center" />
         <AuthProvider>
           <CartProvider>
             <FavoritesProvider>
               <NavbarContainer />
-              <Toaster position="top-center" />
               <main className="flex-1">{children}</main>
               <Footer />
             </FavoritesProvider>

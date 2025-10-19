@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { Product } from "@/lib/utils/product-utils";
 import SizeGuideModal from "@/components/Products/SizeGuideModal";
 import { pickGuideCategory } from "@/lib/printful-features";
+import { useRouter } from "next/navigation";
 
 type ProductClientProps = {
   product: Product;
@@ -19,6 +20,7 @@ type ProductClientProps = {
 export default function ProductClient({ product }: ProductClientProps) {
   const { data: session } = useSession();
   const { addToCart } = useCart();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
   const [selectedQuantity, setSelectedQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
@@ -73,7 +75,7 @@ export default function ProductClient({ product }: ProductClientProps) {
 
   const handleToggleFavorite = async () => {
     if (!session?.user?.email) {
-      toast.error("Please sign in to add favorites");
+      router.push("/auth/sign-in");
       return;
     }
 
@@ -162,10 +164,10 @@ export default function ProductClient({ product }: ProductClientProps) {
               {product.colors.map((color: string) => (
                 <Button
                   key={color}
-                  className={`w-4 h-4 rounded-full shadow-md ${
+                  className={`w-5 h-4 rounded-full shadow-md ${
                     selectedColor === color
-                      ? "border-nsanity-darkorange border-2"
-                      : " border-[.5px] border-gray-400"
+                      ? "border-nsanity-darkorange border-[0.7px]"
+                      : " border-[.7px] border-gray-400"
                   }`}
                   style={{ backgroundColor: mapColorToCss(color) }}
                   title={color}
@@ -261,13 +263,13 @@ export default function ProductClient({ product }: ProductClientProps) {
           <div className="flex space-x-8 border-b border-nsanity-gray">
             <button
               onClick={() => setActiveTab("details")}
-              className={`p-4 text-lg font-medium transition-colors ${activeTab === "details" ? "text-nsanity-darkorange border-b-2 border-nsanity-darkorange" : "text-gray-500 hover:text-gray-700"}`}
+              className={`p-4 text-lg font-medium transition-colors hover:cursor-pointer ${activeTab === "details" ? "text-nsanity-darkorange border-b-2 border-nsanity-darkorange" : "text-gray-500 hover:text-gray-700"}`}
             >
               Details
             </button>
             <button
               onClick={() => setActiveTab("shipping")}
-              className={`p-4 text-lg font-medium transition-colors ${
+              className={`p-4 text-lg font-medium transition-colors hover:cursor-pointer ${
                 activeTab === "shipping"
                   ? "text-nsanity-darkorange border-b-2 border-nsanity-darkorange"
                   : "text-gray-500 hover:text-gray-700"

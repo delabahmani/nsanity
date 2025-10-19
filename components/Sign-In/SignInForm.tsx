@@ -7,8 +7,10 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import Modal from "../Modal";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
+  const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -65,7 +67,8 @@ export default function SignInForm() {
           toast.error("Invalid email or password. Please try again.");
         } else {
           toast.success("Welcome back!");
-          window.location.href = "/";
+          router.push("/");
+          router.refresh();
         }
       } catch (signInError: unknown) {
         console.error("Sign in failed:", signInError);
@@ -117,7 +120,10 @@ export default function SignInForm() {
 
       {/* Email/Password Form */}
       <div className="w-full max-w-md mb-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 flex-col flex items-center justify-center"
+        >
           {isSignUp && (
             <input
               type="text"
@@ -139,7 +145,7 @@ export default function SignInForm() {
             disabled={loading}
           />
           {/* Password Input with Show/Hide Toggle */}
-          <div className="relative">
+          <div className="relative w-full">
             <input
               type={showPassword ? "text" : "password"}
               placeholder={
@@ -199,12 +205,13 @@ export default function SignInForm() {
               setPassword("");
               setShowPassword(false); // Reset password visibility when switching
             }}
-            className="text-black/60 hover:text-black transition-colors font-medium"
+            className="text-black/60 transition-colors font-medium"
             disabled={loading}
           >
-            {isSignUp
-              ? "Already have an account? Sign in"
-              : "Don't have an account? Sign up"}
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
+            <span className="text-black hover:text-nsanity-darkorange transition-colors cursor-pointer">
+              {isSignUp ? "Sign in" : "Sign up"}
+            </span>
           </button>
         </div>
       </div>
