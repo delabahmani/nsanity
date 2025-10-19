@@ -1,4 +1,4 @@
-import { MapPin, User } from "lucide-react";
+import { MapPin, Pencil, User } from "lucide-react";
 import Button from "../ui/Button";
 
 interface ProfileInfoProps {
@@ -15,6 +15,7 @@ interface ProfileInfoProps {
     };
   };
   isEditing: boolean;
+  onEditToggle: () => void;
   onChange: (field: string, value: string) => void;
   onSave: () => void;
 }
@@ -22,11 +23,23 @@ interface ProfileInfoProps {
 export default function ProfileInfo({
   userInfo,
   isEditing,
+  onEditToggle,
   onChange,
   onSave,
 }: ProfileInfoProps) {
   return (
-    <div className="space-y-6">
+    <div>
+      <div className="flex justify-center mb-10">
+        <Button
+          variant="default"
+          className="flex w-full items-center gap-2"
+          onClick={onEditToggle}
+        >
+          <Pencil className="w-4 h-4" />
+          {isEditing ? "Cancel" : "Edit Profile"}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Personal info */}
         <div className="bg-nsanity-white rounded-xl shadow p-6 h-full flex flex-col">

@@ -182,13 +182,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center">
-      <div className="w-full max-md:max-w-5xl max-md:mx-auto px-4 lg:py-10 py-4">
-        <ProfileHeader
-          name={userInfo.name}
-          isEditing={isEditing}
-          onEditToggle={() => setIsEditing((v) => !v)}
-          showEditBtn={tab === "profile"}
-        />
+      <div className="w-full px-4 py-4 lg:py-10 md:max-w-5xl md:mx-auto">
+        <ProfileHeader name={userInfo.name} />
         <ProfileTabs tab={tab} setTab={setTab} />
         {tab === "profile" && (
           <ProfileInfo
@@ -196,6 +191,7 @@ export default function ProfilePage() {
             isEditing={isEditing}
             onChange={handleChange}
             onSave={handleSave}
+            onEditToggle={() => setIsEditing((v) => !v)}
           />
         )}
         {tab === "favorites" && <ProfileFavorites />}
