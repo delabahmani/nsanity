@@ -232,9 +232,8 @@ export default function ProductClient({ product }: ProductClientProps) {
             {/* Add to Cart */}
             <div className="flex space-x-4 pt-6 items-center">
               <Button
-                className="gap-3"
+                className="gap-3 md:px-10"
                 variant="primary"
-                size="xl"
                 onClick={handleAddToCart}
               >
                 <ShoppingBag size={20} />
@@ -244,7 +243,6 @@ export default function ProductClient({ product }: ProductClientProps) {
               {/* Favorite Button */}
               <Button
                 variant="default"
-                size="lg"
                 onClick={handleToggleFavorite}
                 disabled={favoritesLoading}
                 className={`${isFavorited ? "text-red-500" : "text-gray-500"} transition-colors`}

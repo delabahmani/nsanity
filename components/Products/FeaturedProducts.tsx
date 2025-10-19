@@ -26,7 +26,9 @@ export default async function FeaturedProducts() {
 
         <div className="mt-8 text-center">
           <Link href="/products" className="inline-block">
-            <Button variant="link">view all products</Button>
+            <Button variant="primary" className="md:px-10">
+              view all products
+            </Button>
           </Link>
         </div>
       </div>
