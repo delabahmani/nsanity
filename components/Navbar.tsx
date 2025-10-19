@@ -61,7 +61,7 @@ export default function Navbar({ session }: { session: Session | null }) {
   if (hideNavbar) return null;
 
   return (
-    <header className="bg-nsanity-cream/90 fixed w-full z-50 backdrop-blur-md drop-shadow-sm">
+    <header className="bg-nsanity-cream/90 fixed w-full z-50 backdrop-blur-md drop-shadow-sm hidden lg:block">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
         <div className="flex lg:flex-1">
           <Link href={"/"} className="flex items-center">
