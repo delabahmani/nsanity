@@ -14,8 +14,8 @@ export default async function Products() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen nav-pad bg-[#fffbf8]">
-      <div className="">
+    <div className="flex flex-col min-h-screen nav-pad bg-[#fffbf8] max-md:max-w-7xl max-md:mx-auto px-4">
+      <div>
         <h1 className="text-black font-bold text-3xl text-center py-6 ">
           products
         </h1>

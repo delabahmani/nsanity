@@ -182,7 +182,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center">
-      <div className="w-full max-w-5xl lg:py-10 py-4">
+      <div className="w-full max-md:max-w-5xl max-md:mx-auto px-4 lg:py-10 py-4">
         <ProfileHeader
           name={userInfo.name}
           isEditing={isEditing}

@@ -23,8 +23,8 @@ export default function Footer() {
   return (
     <footer className="border-t border-nsanity-gray bg-white">
       <div className="max-w-7xl mx-auto px-4 py-5">
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6">
-          <div className="justify-self-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 text-center md:text-left">
+          <div className="justify-self-center md:justify-self-start">
             <Link href={"/"} className="flex">
               <Image
                 src={"/images/logo.webp"}
@@ -33,7 +33,7 @@ export default function Footer() {
                 height={200}
                 quality={100}
                 priority
-                className="m-4 max-lg:w-24 lg:w-36 h-auto object-contain object-left"
+                className="m-4 max-lg:w-28 lg:w-36 h-auto object-contain mx-auto md:mx-0"
               />
             </Link>
           </div>
@@ -75,7 +75,7 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <div className="justify-self-end">
+          <div className="justify-self-center md:justify-self-end mb-4 md:mb-0">
             {instagram && (
               <Link
                 href={instagram}
