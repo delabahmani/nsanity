@@ -10,7 +10,7 @@ export default async function FeaturedProducts() {
   if (!featured || featured.length === 0) return null;
 
   return (
-    <section className="py-16 relative z-20 mt-16 md:mt-24 lg:mt-40">
+    <section className="py-16 relative z-20 mt-16 md:mt-24 lg:mt-30">
       <div className="max-w-7xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-center">featured pieces</h2>
         <p className="text-center text-nsanity-black/50 mt-2">
