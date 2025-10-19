@@ -209,7 +209,7 @@ export default function ProfileSettings() {
           </Button>
 
           {/* Delete Account Button */}
-          <div className="pt-4">
+          <div>
             <Button
               className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               onClick={() => setShowDeleteConfirmModal(true)}

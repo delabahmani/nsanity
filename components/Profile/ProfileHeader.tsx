@@ -5,10 +5,12 @@ export default function ProfileHeader({
   name,
   isEditing,
   onEditToggle,
+  showEditBtn = true,
 }: {
   name: string;
   isEditing: boolean;
   onEditToggle: () => void;
+  showEditBtn?: boolean;
 }) {
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
@@ -25,14 +27,17 @@ export default function ProfileHeader({
           </p>
         </div>
       </div>
-      <Button
-        variant="ghost"
-        className="mt-4 md:mt-0 flex items-center gap-2"
-        onClick={onEditToggle}
-      >
-        <Pencil className="w-4 h-4" />
-        {isEditing ? "Cancel" : "Edit Profile"}
-      </Button>
+
+      {showEditBtn && (
+        <Button
+          variant="ghost"
+          className="mt-4 md:mt-0 flex items-center gap-2"
+          onClick={onEditToggle}
+        >
+          <Pencil className="w-4 h-4" />
+          {isEditing ? "Cancel" : "Edit Profile"}
+        </Button>
+      )}
     </div>
   );
 }

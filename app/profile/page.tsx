@@ -187,6 +187,7 @@ export default function ProfilePage() {
           name={userInfo.name}
           isEditing={isEditing}
           onEditToggle={() => setIsEditing((v) => !v)}
+          showEditBtn={tab === "profile"}
         />
         <ProfileTabs tab={tab} setTab={setTab} />
         {tab === "profile" && (
