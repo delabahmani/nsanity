@@ -122,6 +122,7 @@ export default function SignInForm() {
       <div className="w-full max-w-md mb-6">
         <form
           onSubmit={handleSubmit}
+          name="signin"
           className="space-y-4 flex-col flex items-center justify-center"
         >
           {isSignUp && (
@@ -133,6 +134,7 @@ export default function SignInForm() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nsanity-orange focus:border-transparent"
               required
               disabled={loading}
+              autoComplete="name"
             />
           )}
           <input
@@ -143,6 +145,7 @@ export default function SignInForm() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-nsanity-orange focus:border-transparent"
             required
             disabled={loading}
+            autoComplete="email"
           />
           {/* Password Input with Show/Hide Toggle */}
           <div className="relative w-full">
@@ -157,6 +160,7 @@ export default function SignInForm() {
               minLength={isSignUp ? 6 : 1}
               required
               disabled={loading}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
             />
             <button
               type="button"
