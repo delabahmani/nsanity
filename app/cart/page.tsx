@@ -131,7 +131,7 @@ export default function CartPage() {
             <div className="flex gap-3">
               <Button
                 variant="ghost"
-                onClick={clearCart}
+                onClick={() => clearCart()}
                 className="text-nsanity-red"
               >
                 Clear Cart
