@@ -142,7 +142,7 @@ export default function ProductClient({ product }: ProductClientProps) {
         <div className="mb-6">
           <Link
             href="/products"
-            className="text-black font-bold flex items-center mt-6"
+            className="text-black font-bold flex items-center py-6 w-fit"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Products
