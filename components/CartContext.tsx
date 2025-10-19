@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from "react";
 
 export type CartItem = {
@@ -28,7 +29,7 @@ type CartContextType = {
     size: string,
     color: string
   ) => void;
-  clearCart: () => void;
+  clearCart: (options?: { suppressDbSync?: boolean }) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -39,6 +40,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoadedInitialCart, setHasLoadedInitialCart] = useState(false);
   const [previousStatus, setPreviousStatus] = useState<string>("loading");
+
+  const suppressDbSyncRef = useRef(false);
+  const signOutInProgressRef = useRef(false);
 
   const loadCartFromLocalStorage = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -81,6 +85,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const saveCartToLocalStorage = useCallback(() => {
     if (!hasLoadedInitialCart) return;
 
@@ -110,16 +115,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (
       status === "authenticated" &&
       previousStatus !== "authenticated" &&
-      session?.user?.email &&
-      !hasLoadedInitialCart
+      session?.user?.email
     ) {
+      setHasLoadedInitialCart(false);
       loadCartFromDatabase();
     } else if (
       status === "unauthenticated" &&
-      previousStatus !== "unauthenticated" &&
-      !hasLoadedInitialCart
+      previousStatus !== "unauthenticated"
     ) {
+      setHasLoadedInitialCart(false);
       loadCartFromLocalStorage();
+
+      if (signOutInProgressRef.current) {
+        signOutInProgressRef.current = false;
+      }
     }
 
     setPreviousStatus(status);
@@ -132,23 +141,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     hasLoadedInitialCart,
   ]);
 
-  // Prevent saves during loading transitions
+  // Prevent saves during loading transitions or sign-out window
   useEffect(() => {
-    // Only save if cart has items OR if we're updating an existing cart
+    if (!hasLoadedInitialCart) return;
+
+    // If we’re in the sign-out window, block any save (dev StrictMode safe)
+    if (signOutInProgressRef.current) {
+      return;
+    }
+
+    // Skip a single DB sync when explicitly suppressed
+    if (suppressDbSyncRef.current) {
+      suppressDbSyncRef.current = false;
+      return;
+    }
+
     if (
       status === "authenticated" &&
       !isLoading &&
-      hasLoadedInitialCart &&
       previousStatus === "authenticated"
     ) {
-      // Don't save empty cart immediately after loading - only save if cart has items
       saveCartToDatabase();
     } else if (
       status === "unauthenticated" &&
-      hasLoadedInitialCart &&
       previousStatus === "unauthenticated"
     ) {
-      saveCartToLocalStorage();
+      // Guest persistence
+      if (typeof window !== "undefined") {
+        localStorage.setItem("cart", JSON.stringify(cart));
+      }
     }
   }, [
     cart,
@@ -157,7 +178,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     hasLoadedInitialCart,
     saveCartToDatabase,
-    saveCartToLocalStorage,
   ]);
 
   const addToCart = (item: CartItem) => {
@@ -201,22 +221,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const clearCart = () => {
-    setCart([]);
-
-    // Clear from localStorage
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("cart");
+  const clearCart = (options?: { suppressDbSync?: boolean }) => {
+    // When signing out, suppress DB syncs until auth becomes unauthenticated
+    if (options?.suppressDbSync) {
+      suppressDbSyncRef.current = true;
+      signOutInProgressRef.current = true; // [ADD]
     }
 
-    // Force save empty cart to db if authenticated
-    if (status === "authenticated") {
-      fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ cart: [] }),
-      }).catch(console.error);
+    setCart([]);
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cart");
     }
   };
 

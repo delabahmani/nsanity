@@ -96,7 +96,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               <li>
                 <Link
                   href="/profile"
-                  onClick={close}
+                  onClick={handleMenuClick}
                   className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
                   role="menuitem"
                 >
@@ -109,7 +109,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
                 <li>
                   <Link
                     href="/admin"
-                    onClick={close}
+                    onClick={handleMenuClick}
                     className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
                     role="menuitem"
                   >
@@ -125,7 +125,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               <li>
                 <Link
                   href="/profile?tab=settings"
-                  onClick={close}
+                  onClick={handleMenuClick}
                   className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-nsanity-cream/50 transition"
                   role="menuitem"
                 >
@@ -137,8 +137,8 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
               <li>
                 <button
                   onClick={() => {
-                    close();
-                    clearCart();
+                    setIsOpen(false);
+                    clearCart({ suppressDbSync: true });
                     signOut({ callbackUrl: "/" });
                   }}
                   className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm hover:cursor-pointer hover:bg-nsanity-cream/50 transition"
