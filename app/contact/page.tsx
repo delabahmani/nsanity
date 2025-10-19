@@ -57,21 +57,23 @@ export default function Contact() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#fffbf8] w-full">
-      <div className="max-lg:w-full flex items-center justify-center lg:w-2/3 h-full p-6">
-        <div className="w-full max-w-md xl:max-w-xl">
-          <h1 className="text-nsanity-black font-bold text-3xl text-center py-4">
+    <div className="flex min-h-screen bg-[#fffbf8] w-full nav-pad">
+      <div className="max-lg:w-full flex items-center justify-center lg:w-2/3 h-full p-3">
+        <div className="w-full max-w-sm xl:max-w-xl">
+          <h1 className="text-nsanity-black font-bold text-3xl text-center mb-2">
             contact us
           </h1>
 
           {/* Quick help */}
-          <div className="bg-white rounded-lg p-4 mb-6 border border-nsanity-darkorange/20">
-            <h2 className="font-semibold mb-3 text-nsanity-darkorange">
+          <div className="bg-white rounded-lg p-4 mb-4 border border-nsanity-darkorange/20">
+            <h2 className="font-semibold mb-2 text-nsanity-darkorange">
               Need quick help?
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <h3 className="font-medium text-black mb-2">For Sellers:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+              <div className="self-start">
+                <h3 className="font-medium text-black mb-2 leading-none">
+                  For Sellers:
+                </h3>
                 <ul className="space-y-1 text-nsanity-black/75">
                   <li>• How to create products</li>
                   <li>• Design Canvas help</li>
@@ -79,8 +81,10 @@ export default function Contact() {
                   <li>• Store setup</li>
                 </ul>
               </div>
-              <div>
-                <h3 className="font-medium text-black mb-2">For Buyers:</h3>
+              <div className="self-start">
+                <h3 className="font-medium text-black mb-2 leading-none">
+                  For Buyers:
+                </h3>
                 <ul className="space-y-1 text-nsanity-black/75">
                   <li>• Order tracking</li>
                   <li>• Size guides</li>
@@ -98,7 +102,7 @@ export default function Contact() {
           >
             <div className="space-y-4">
               <div>
-                <label className="block font-medium mb-2">
+                <label className="block font-medium mb-1">
                   What&apos;s this about?
                 </label>
                 <select
