@@ -108,9 +108,9 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="nav-pad bg-nsanity-cream min-h-screen w-full flex justify-center items-center flex-col">
+    <div className="nav-pad bg-nsanity-cream min-h-screen w-full flex justify-center items-center flex-col px-5 md:px-0">
       <div className="flex items-center justify-center gap-y-5 flex-col mb-8">
-        <h1 className="font-bold text-4xl">welcome to nsanity</h1>
+        <h1 className="font-bold md:text-4xl text-2xl">welcome to nsanity</h1>
         <p className="font-semibold text-black/60">
           {isSignUp
             ? "create an account to get started"
@@ -250,10 +250,17 @@ export default function SignInForm() {
       <Modal
         isOpen={showForgot}
         onClose={() => setShowForgot(false)}
-        title="Reset your password"
         maxWidth="max-w-md"
       >
         <form onSubmit={handleForgotPassword} className="space-y-4">
+          <div className="flex items-center justify-center">
+            <div className="w-8" aria-hidden />
+            <h3 className="text-lg font-medium text-center">
+              Reset your password
+            </h3>
+            <div className="w-8" aria-hidden />
+          </div>
+
           <input
             type="email"
             placeholder="Enter your email"
