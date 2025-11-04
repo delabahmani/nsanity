@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 const FREE_SHIPPING_THRESHOLD = 0;
@@ -32,52 +33,49 @@ function CartItemComponent({
   removeFromCart: (productId: string, size: string, color: string) => void;
 }) {
   return (
-    <div className="bg-white border border-nsanity-gray rounded-xl p-4 md:p-5 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-4 md:gap-6">
-        <div className="w-24 h-24 md:w-28 md:h-28 flex items-center justify-center rounded-lg overflow-hidden bg-nsanity-cream border border-dashed border-black/50">
-          <Image
-            src={item.image || "/images/placeholder.webp"}
-            alt={item.name}
-            width={128}
-            height={128}
-            className="object-cover"
-            priority
-          />
+    <div className="bg-white border border-nsanity-gray rounded-xl p-4 md:p-5 flex items-center gap-3">
+      <div className="relative w-20 h-20 md:w-28 md:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-nsanity-cream border border-dashed border-black/50">
+        <Image
+          src={item.image || "/images/placeholder.webp"}
+          alt={item.name}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="text-sm sm:text-lg md:text-xl font-semibold text-black leading-tight">
+          {item.name}
+        </div>
+        <div className="text-black/65 text-xs sm:text-sm md:text-base mt-1">
+          Size: {item.size} • Color: {item.color}
         </div>
 
-        <div>
-          <div className="text-lg md:text-xl font-semibold text-black">
-            {item.name}
-          </div>
-          <div className="text-black/65 text-sm md:text-base mt-1">
-            Size: {item.size} • Color: {item.color}
-          </div>
-
-          <div className="mt-3 flex items-center gap-3">
-            <QuantitySelector
-              size="sm"
-              initialValue={item.quantity}
-              min={1}
-              max={10}
-              onChange={(q) =>
-                updateQuantity(item.productId, q, item.size, item.color)
-              }
-            />
-            <button
-              className="p-2 text-black/60 hover:text-nsanity-red"
-              onClick={() =>
-                removeFromCart(item.productId, item.size, item.color)
-              }
-              aria-label="Remove item"
-            >
-              <Trash2 size={18} />
-            </button>
-          </div>
+        <div className="mt-3 flex items-center gap-3">
+          <QuantitySelector
+            size="sm"
+            initialValue={item.quantity}
+            min={1}
+            max={10}
+            onChange={(q) =>
+              updateQuantity(item.productId, q, item.size, item.color)
+            }
+          />
+          <button
+            className="p-2 text-black/60 hover:text-nsanity-red"
+            onClick={() =>
+              removeFromCart(item.productId, item.size, item.color)
+            }
+            aria-label="Remove item"
+          >
+            <Trash2 size={18} />
+          </button>
         </div>
       </div>
 
-      <div className="text-right">
-        <div className="text-xl md:text-2xl font-bold">
+      <div className="flex-shrink-0 w-20 sm:w-24 text-right">
+        <div className="text-sm sm:text-lg md:text-2xl font-bold">
           ${(item.price * item.quantity).toFixed(2)}
         </div>
       </div>
@@ -87,10 +85,17 @@ function CartItemComponent({
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  const handleClearCart = () => {
+    clearCart();
+    setShowClearConfirm(false);
+    toast.success("Cart cleared");
+  };
 
   if (cart.length === 0) {
     return (
@@ -110,34 +115,69 @@ export default function CartPage() {
   }
 
   return (
-    <div className="nav-pad bg-nsanity-cream">
-      <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
-        <div className="flex items-start justify-between py-5 md:py-10">
-          <div>
-            <h1 className="text-4xl font-bold">Your Cart</h1>
-            <p className="text-black/60 mt-1">
-              {cart.length} {cart.length === 1 ? "item" : "items"} in your cart
+    <div className="nav-pad bg-nsanity-cream overflow-x-hidden">
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 className="text-xl font-bold mb-2">Clear Cart?</h3>
+            <p className="text-black/70 mb-4">
+              Are you sure you want to remove all items from your cart?
             </p>
-          </div>
-          <Link href="/products" className="inline-flex">
-            <Button variant="ghost" className="flex items-center gap-2">
-              <ArrowLeft size={16} /> Continue Shopping
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-5">
             <div className="flex gap-3">
               <Button
                 variant="ghost"
-                onClick={() => clearCart()}
-                className="text-nsanity-red"
+                onClick={() => setShowClearConfirm(false)}
+                className="flex-1"
               >
-                Clear Cart
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleClearCart}
+                className="flex-1"
+              >
+                Clear All
               </Button>
             </div>
+          </div>
+        </div>
+      )}
 
+      <div className="mx-auto w-full max-w-6xl px-3 sm:px-4 md:px-6">
+        <div className="flex items-center justify-between py-5 md:py-10">
+          <div className="flex items-center gap-3">
+            <Link href="/products" className="md:hidden">
+              <button className="p-2 hover:bg-nsanity-gray/20 rounded-lg transition-colors">
+                <ArrowLeft size={20} />
+              </button>
+            </Link>
+            <div className="text-left">
+              <h1 className="text-2xl md:text-4xl font-bold">Your Cart</h1>
+              <p className="md:text-xl text-sm text-black/60 mt-1">
+                {cart.length} {cart.length === 1 ? "item" : "items"} in your
+                cart
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            <Link href="/products" className="hidden md:block">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <ArrowLeft size={16} /> Continue Shopping
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              onClick={() => setShowClearConfirm(true)}
+              className="text-sm sm:text-base text-nsanity-red hover:underline"
+            >
+              Clear Cart
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-5">
             {cart.map((item) => (
               <CartItemComponent
                 key={item.productId + item.size + item.color}
@@ -148,7 +188,7 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="bg-white border border-nsanity-gray rounded-xl p-5">
               <div className="flex items-center gap-2 font-semibold mb-3">
                 <Tag size={18} /> Promo Code
@@ -156,7 +196,7 @@ export default function CartPage() {
               <div className="flex">
                 <input
                   type="text"
-                  className="flex-1 border border-nsanity-gray rounded-l-md px-3 py-2 bg-orange-50"
+                  className="flex-1 border border-nsanity-gray rounded-l-md px-3 py-2 bg-orange-50 w-full"
                   placeholder="Enter code"
                   disabled
                 />
@@ -218,7 +258,7 @@ export default function CartPage() {
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-6 text-xs text-black/70">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-black/70">
               <span className="inline-flex items-center gap-1">
                 <ShieldCheck size={14} /> Secure Payment
               </span>

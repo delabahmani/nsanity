@@ -127,14 +127,14 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
         <Link
           href="/cart"
           onClick={closeMenu}
-          className="flex items-center justify-between w-full px-4 py-3 rounded-md bg-nsanity-cream hover:bg-nsanity-cream/70 transition"
+          className="flex items-center justify-center w-full px-4 py-3 rounded-md bg-nsanity-cream hover:bg-nsanity-cream/70 transition"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <ShoppingBasket size={24} className="text-nsanity-black" />
-            <span className="font-semibold">Cart</span>
+            <span className="font-semibold text-lg">Cart</span>
           </div>
           {cartCount > 0 && (
-            <span className="bg-nsanity-orange text-nsanity-black text-sm rounded-full h-6 w-6 font-bold flex items-center justify-center">
+            <span className="bg-nsanity-orange text-nsanity-black text-sm rounded-full h-6 w-6 font-bold flex items-center justify-center ml-3">
               {cartCount}
             </span>
           )}

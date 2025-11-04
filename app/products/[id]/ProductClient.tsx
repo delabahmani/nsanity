@@ -71,6 +71,7 @@ export default function ProductClient({ product }: ProductClientProps) {
       color: selectedColor,
       image: product.images[0],
     });
+    toast.success("Item added to cart!")
   };
 
   const handleToggleFavorite = async () => {
