@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import ProfileBtn from "./ProfileBtn";
 import { Session } from "next-auth";
 import Button from "./ui/Button";
+import Logo from "./ui/Logo";
 
 export default function Navbar({ session }: { session: Session | null }) {
   const pathname = usePathname();
@@ -62,19 +63,9 @@ export default function Navbar({ session }: { session: Session | null }) {
 
   return (
     <header className="bg-nsanity-cream/90 fixed w-full z-50 backdrop-blur-md drop-shadow-sm hidden lg:block">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between py-6 px-4 lg:px-8">
         <div className="flex lg:flex-1">
-          <Link href={"/"} className="flex items-center">
-            <Image
-              src={"/images/logo.webp"}
-              alt="Logo"
-              width={200}
-              height={200}
-              quality={100}
-              priority
-              className="m-4 max-lg:w-24 lg:w-36 h-auto object-contain object-left"
-            />
-          </Link>
+          <Logo variant="navbar" />
         </div>
 
         <div className="hidden lg:flex lg:gap-x-12">

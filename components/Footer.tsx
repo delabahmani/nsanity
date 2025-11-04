@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import Logo from "./ui/Logo";
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -22,20 +22,10 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-nsanity-gray bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-5">
+      <div className="max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 text-center md:text-left">
           <div className="justify-self-center md:justify-self-start">
-            <Link href={"/"} className="flex">
-              <Image
-                src={"/images/logo.webp"}
-                alt="Logo"
-                width={200}
-                height={200}
-                quality={100}
-                priority
-                className="m-4 max-lg:w-28 lg:w-36 h-auto object-contain mx-auto md:mx-0"
-              />
-            </Link>
+            <Logo variant="footer" className="m-4 mx-auto md:mx-0" />
           </div>
 
           <nav className="justify-self-center" aria-label="Footer">

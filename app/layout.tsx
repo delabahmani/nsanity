@@ -6,6 +6,15 @@ import { Toaster } from "react-hot-toast";
 import { CartProvider } from "@/components/CartContext";
 import { FavoritesProvider } from "@/components/FavoritesContext";
 import Footer from "@/components/Footer";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "nsanity",
+  description: "shop nsanity",
+  icons: {
+    icon: "/favicon.png",
+  },
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +33,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.png?v=2" />
+        <link rel="apple-touch-icon" href="/favicon.png?v=2" />
+        <link rel="icon" type="image/x-icon" href="/favicon.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >

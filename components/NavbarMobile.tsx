@@ -8,13 +8,13 @@ import {
   LogOut,
 } from "lucide-react";
 import { useCart } from "./CartContext";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Session } from "next-auth";
 import Button from "./ui/Button";
 import { signOut } from "next-auth/react";
+import Logo from "./ui/Logo";
 
 type NavbarMobileProps = {
   session: Session | null;
@@ -61,17 +61,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
     >
       {/* Top bar */}
       <div className="flex items-center justify-between p-4 border-b border-nsanity-gray/30">
-        <Link href="/" className="flex items-center" onClick={closeMenu}>
-          <Image
-            src="/images/logo.webp"
-            alt="Logo"
-            width={120}
-            height={120}
-            quality={100}
-            priority
-            className="h-auto object-contain"
-          />
-        </Link>
+        <Logo variant="navbar" />
 
         {/* Hamburger */}
         <button
