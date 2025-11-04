@@ -62,10 +62,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/products/${product.id}`} className="group relative">
+    <Link href={`/products/${product.id}`} className="group relative h-full flex flex-col">
       <button
         onClick={handleToggleFavorite}
-        className="absolute top-2 right-2 z-10 p-2 bg-nsanity-cream/80 rounded-md shadow-md hover:bg-nsanity-cream transition-colors hover:scale-105 hover:cursor-pointer"
+        className="absolute top-2 right-2 z-10 p-2 bg-nsanity-cream/80 rounded-md shadow-md hover:bg-nsanity-cream transition-transform hover:scale-105 hover:cursor-pointer"
         aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
         disabled={isLoading}
       >
@@ -85,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       )}
 
       <div className="bg-nsanity-cream rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl">
-        <div className="relative h-96 w-full bg-[#FFFFFF] flex items-center justify-center p-6">
+        <div className="relative h-96 w-full bg-[#FFFFFF] flex flex-shrink items-center justify-center p-6">
           <div className="relative h-full w-full flex items-center justify-center">
             <Image
               src={product.images[0] || "/images/placeholder.webp"}
@@ -93,6 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-contain group-hover:scale-105 transition-transform duration-300"
               priority
+              quality={100}
             />
           </div>
         </div>
