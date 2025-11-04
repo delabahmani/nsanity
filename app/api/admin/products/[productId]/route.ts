@@ -70,6 +70,7 @@ export async function PATCH(
       inStock,
       isFeatured,
       images,
+      syncWithPrintful,
     } = await req.json();
 
     if (price !== undefined && price <= 0) {
@@ -114,7 +115,7 @@ export async function PATCH(
     }
 
     // Update Printful if Product exists
-    if (product.printfulSyncProductId) {
+    if (syncWithPrintful && product.printfulSyncProductId) {
       try {
         await printfulService.updateSyncProduct(product.printfulSyncProductId, {
           sync_product: { name, thumbnail: images[0] },
@@ -127,8 +128,9 @@ export async function PATCH(
             }))
           ),
         });
-      } catch (error) {
-        console.error("Printful update failed: ", error);
+        console.log("Printful sync completed successfuly");
+      } catch (printfulError) {
+        console.error("Printful sync failed (non-critical): ", printfulError);
       }
     }
 
@@ -211,8 +213,8 @@ export async function DELETE(
     if (product.printfulSyncProductId) {
       try {
         await printfulService.deleteSyncProduct(product.printfulSyncProductId);
-      } catch (error) {
-        console.error("Printful deletion error", error);
+      } catch (printfulError) {
+        console.error("Printful deletion error (non-critical):", printfulError);
       }
     }
 
@@ -220,8 +222,8 @@ export async function DELETE(
     if (product.images && product.images.length > 0) {
       try {
         await deleteUploadThingFiles(product.images);
-      } catch {
-        console.error("Product file deletion failed");
+      } catch (uploadError) {
+        console.error("Product file deletion failed:", uploadError);
         return NextResponse.json(
           { error: "Failed to delete product files" },
           { status: 500 }
@@ -255,8 +257,8 @@ export async function DELETE(
 
         await Promise.all(updatePromises);
       }
-    } catch (error) {
-      console.error("Wishlist cleanup failed", error);
+    } catch (wishlistError) {
+      console.error("Wishlist cleanup failed:", wishlistError);
     }
 
     // Finally delete the product from database

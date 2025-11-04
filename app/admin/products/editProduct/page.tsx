@@ -36,20 +36,12 @@ export default function EditProductPage() {
   }, []);
 
   const handleSuccessfulEdit = async () => {
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/admin/products");
-      if (!res.ok) {
-        throw new Error("Failed to fetch products");
-      }
-      const data = await res.json();
-      setProducts(data);
-      setSelectedProduct(null);
-    } catch (err) {
-      console.error("Error refreshing products:", err);
-    } finally {
-      setIsLoading(false);
-    }
+    setSelectedProduct(null);
+    // Refetch without setting loading state
+    fetch("/api/admin/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products || []))
+      .catch((err) => console.error("Error refreshing products:", err));
   };
 
   if (isLoading) {
