@@ -358,7 +358,7 @@ export default function ProductFilters({
               setCategoryOpen(false);
               setSizeOpen(false);
             }}
-            className="flex items-center gap-2 px-4 py-2 border border-nsanity-gray rounded-lg hover:bg-nsanity-gray/20 transition-colors min-w-[160px] justify-between"
+            className="flex items-center gap-2 px-4 py-2 border border-nsanity-gray rounded-lg hover:bg-nsanity-gray/20 transition-colors min-w-40 justify-between"
           >
             <span className="text-sm font-medium">Sort: {getSortLabel()}</span>
             <ChevronDown className="h-4 w-4" />

@@ -34,7 +34,7 @@ function CartItemComponent({
 }) {
   return (
     <div className="bg-white border border-nsanity-gray rounded-xl p-4 md:p-5 flex items-center gap-3">
-      <div className="relative w-20 h-20 md:w-28 md:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-nsanity-cream border border-dashed border-black/50">
+      <div className="relative w-20 h-20 md:w-28 md:h-28 shrink-0 rounded-lg overflow-hidden bg-nsanity-cream border border-dashed border-black/50">
         <Image
           src={item.image || "/images/placeholder.webp"}
           alt={item.name}
@@ -74,7 +74,7 @@ function CartItemComponent({
         </div>
       </div>
 
-      <div className="flex-shrink-0 w-20 sm:w-24 text-right">
+      <div className="shrink-0 w-20 sm:w-24 text-right">
         <div className="text-sm sm:text-lg md:text-2xl font-bold">
           ${(item.price * item.quantity).toFixed(2)}
         </div>

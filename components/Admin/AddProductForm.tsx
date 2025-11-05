@@ -1,12 +1,14 @@
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import useImageUpload from "@/hooks/useImageUpload";
 import FileUploader from "./FileUploader";
 import Image from "next/image";
-import DesignCanvas from "./DesignCanvas";
+import DesignCanvas, { DesignCanvasHandle } from "./DesignCanvas";
 import { canonicalizeCategory } from "@/lib/printful-features";
+import { generateReactHelpers } from "@uploadthing/react";
+import { OurFileRouter } from "@/app/api/uploadthing/core";
 
 type ProductFormData = {
   name: string;
@@ -72,12 +74,17 @@ const PRINTFUL_TEMPLATES = [
   { id: 662, name: "Vintage Corduroy Cap" },
 ];
 
+const { useUploadThing } = generateReactHelpers<OurFileRouter>();
+
 export default function AddProductContainer() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   // Design canvas states
+  const designCanvasRef = useRef<DesignCanvasHandle>(null);
+  const { startUpload } = useUploadThing("productImage");
   const [designFile, setDesignFile] = useState<string | null>(null);
+  const [designArtworkUrl, setDesignArtworkUrl] = useState<string | null>(null);
   const [showDesignCanvas, setShowDesignCanvas] = useState(false);
   const [finalDesignData, setFinalDesignData] = useState<{
     x: number;
@@ -362,50 +369,114 @@ export default function AddProductContainer() {
     }));
   };
 
-  const convertBlobToBase64 = async (blobUrl: string): Promise<string> => {
-    const response = await fetch(blobUrl);
-    const blob = await response.blob();
-
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (formData.printfulTemplateId && !finalDesignData) {
-        toast.error("Please position your design on the canvas first!");
+      if (
+        formData.printfulTemplateId &&
+        (!finalDesignData || !designArtworkUrl)
+      ) {
+        toast.error("Upload and place your design artwork first!");
         setIsLoading(false);
         return;
       }
 
-      const imageUrls = await uploadFiles();
+      const extraImageUrls = previews.length > 0 ? await uploadFiles() : [];
 
-      let designFileData = null;
-      if (finalDesignData && designFile) {
-        const base64Design = await convertBlobToBase64(designFile);
-        designFileData = {
-          ...finalDesignData,
-          designFile: base64Design,
-          printArea: printAreas?.[0],
-          templateInfo: selectedTemplate,
-        };
+      let mockupImageUrl: string | null = null;
+      let designDataForAPI: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        designFile: string;
+        printArea: PrintArea;
+        templateInfo: PrintfulTemplate | null;
+      } | null = null;
+
+      // If we have a Printful product with design, upload the final canvas mockup
+      if (finalDesignData && designFile && formData.printfulTemplateId) {
+        toast.loading("Uploading design mockup...", { id: "design-upload" });
+
+        try {
+          if (!designCanvasRef.current) {
+            throw new Error(
+              "Canvas not ready - please try repositioning your design"
+            );
+          }
+
+          // Generate canvas from the visual layout
+          const canvas = await designCanvasRef.current.generateCanvas();
+
+          // Convert canvas to Blob
+          const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  resolve(blob);
+                } else {
+                  reject(new Error("Failed to convert canvas to blob"));
+                }
+              },
+              "image/png",
+              0.95
+            );
+          });
+
+          // Create File from Blob
+          const mockupFile = new File([blob], `mockup_${Date.now()}.png`, {
+            type: "image/png",
+          });
+
+          console.log(
+            "Mockup file size:",
+            (mockupFile.size / 1024 / 1024).toFixed(2),
+            "MB"
+          );
+
+          // Upload using UploadThing's startUpload
+          const uploadResult = await startUpload([mockupFile]);
+
+          if (!uploadResult || uploadResult.length === 0) {
+            throw new Error("Failed to upload mockup image");
+          }
+
+          mockupImageUrl = uploadResult[0].ufsUrl;
+
+          console.log("Mockup uploaded:", mockupImageUrl);
+          toast.success("Design mockup uploaded!", { id: "design-upload" });
+
+          // Prepare design data with URL instead of base64
+          designDataForAPI = {
+            x: finalDesignData.x,
+            y: finalDesignData.y,
+            width: finalDesignData.width,
+            height: finalDesignData.height,
+            designFile: designArtworkUrl!,
+            printArea: printAreas![0],
+            templateInfo: selectedTemplate,
+          };
+        } catch (uploadError) {
+          console.error("Failed to upload mockup:", uploadError);
+          toast.error("Failed to upload design mockup", {
+            id: "design-upload",
+          });
+          setIsLoading(false);
+          return;
+        }
       }
 
-      const productImages =
-        formData.printfulTemplateId && mockupUrl
-          ? [mockupUrl, ...imageUrls]
-          : imageUrls;
+      // Use the uploaded mockup URL as the primary product image
+      const productImages = mockupImageUrl
+        ? [mockupImageUrl, ...extraImageUrls]
+        : extraImageUrls;
 
       const productData = {
         ...formData,
         images: productImages,
-        designData: designFileData,
+        designData: designDataForAPI, 
       };
 
       if (!formData.name) {
@@ -435,8 +506,9 @@ export default function AddProductContainer() {
       });
 
       if (!res.ok) {
-        toast.error("Failed to create product");
-        throw new Error("Failed to create product");
+        const errorData = await res.json();
+        toast.error(errorData.error || "Failed to create product");
+        throw new Error(errorData.error || "Failed to create product");
       }
 
       const { product } = await res.json();
@@ -455,7 +527,7 @@ export default function AddProductContainer() {
           const mockupData = await mockupRes.json();
 
           if (mockupData.success) {
-            toast.success("Mockups generated successfuly!", { id: "mockups" });
+            toast.success("Mockups generated successfully!", { id: "mockups" });
           } else if (mockupRes.status === 202) {
             toast.success(
               "Product created! Mockups will be available shortly.",
@@ -466,12 +538,13 @@ export default function AddProductContainer() {
           }
         } catch (mockupError) {
           console.error("Error fetching mockups: ", mockupError);
-          toast.error("Product created, but mockups failed ot load", {
+          toast.error("Product created, but mockups failed to load", {
             id: "mockups",
           });
         }
       }
 
+      // Reset form
       setFormData({
         name: "",
         description: "",
@@ -487,6 +560,7 @@ export default function AddProductContainer() {
 
       setDesignFile(null);
       setShowDesignCanvas(false);
+      setDesignArtworkUrl(null);
       setFinalDesignData(null);
       setPrintAreas(null);
       setSelectedTemplate(null);
@@ -510,6 +584,22 @@ export default function AddProductContainer() {
     const designUrl = URL.createObjectURL(file);
     setDesignFile(designUrl);
     setShowDesignCanvas(true);
+    setFinalDesignData(null);
+
+    const toastId = toast.loading("Uploading artwork...");
+    try {
+      const upload = await startUpload([file]);
+      if (!upload?.length) {
+        throw new Error("Design upload failed");
+      }
+      setDesignArtworkUrl(upload[0].url);
+      toast.success("Artwork uploaded!", { id: toastId });
+    } catch (err) {
+      console.error("Artwork upload failed:", err);
+      setDesignFile(null);
+      setShowDesignCanvas(false);
+      toast.error("Failed to upload artwork", { id: toastId });
+    }
   };
 
   // UI
@@ -875,6 +965,8 @@ export default function AddProductContainer() {
                       onClick={() => {
                         setShowDesignCanvas(false);
                         setDesignFile(null);
+                        setDesignArtworkUrl(null);
+                        setFinalDesignData(null);
                       }}
                       variant="ghost"
                       className="text-nsanity-red"
@@ -892,7 +984,12 @@ export default function AddProductContainer() {
                           Design Canvas
                         </h4>
                         <DesignCanvas
-                          productMockup={mockupUrl ?? selectedTemplate.image}
+                          ref={designCanvasRef}
+                          productMockup={
+                            printAreas?.[0]?.template_url ??
+                            selectedTemplate?.image ??
+                            ""
+                          }
                           uploadedDesign={designFile}
                           printArea={{
                             x: printAreas[0].left ?? 0,
@@ -902,10 +999,7 @@ export default function AddProductContainer() {
                           }}
                           // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           onDesignUpdate={(designData: any) => {
-                            setFinalDesignData({
-                              ...designData,
-                              designFile: designFile,
-                            });
+                            setFinalDesignData(designData);
                           }}
                         />
                       </div>
