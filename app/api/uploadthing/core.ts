@@ -6,7 +6,7 @@ const f = createUploadthing();
 
 export const ourFileRouter = {
   productImage: f({
-    image: { maxFileSize: "8MB", maxFileCount: 3 },
+    image: { maxFileSize: "16MB", maxFileCount: 3 },
   })
     // Permissions and file types for this route
     .middleware(async () => {
