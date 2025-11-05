@@ -95,7 +95,6 @@ export default function ProfileSettings() {
           setEmailPrefs(data);
         }
       } catch (error) {
-        console.error("Error loading email preferences:", error);
       }
     };
 

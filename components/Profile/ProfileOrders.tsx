@@ -52,7 +52,6 @@ export default function ProfileOrders() {
 
         setOrders(data.orders || []);
       } catch (err) {
-        console.error("Error fetching orders:", err);
         setError(err instanceof Error ? err.message : "Failed to load orders");
       } finally {
         setLoading(false);

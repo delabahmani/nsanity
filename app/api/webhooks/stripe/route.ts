@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { fulfillCheckout } from "@/lib/stripe-fulfillment";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -18,7 +19,6 @@ export async function POST(req: NextRequest) {
       process.env.STRIPE_WEBHOOK_SECRET as string
     );
   } catch (error) {
-    console.error("Stripe webhook signature verification failed:", error);
     return NextResponse.json(
       { error: "Webhook signature verification failed" },
       { status: 400 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getProductFeatures } from "../printful-features";
 import prisma from "../prismadb";
 
@@ -33,7 +34,6 @@ export async function getProductById(id: string): Promise<Product | null> {
         : [],
     } as Product;
   } catch (error) {
-    console.error("Error fetching product:", error);
     return null;
   }
 }
@@ -66,7 +66,6 @@ export async function getAllProducts(): Promise<Product[]> {
         : [],
     })) as Product[];
   } catch (error) {
-    console.error("Error fetching products:", error);
     return [];
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -34,7 +35,6 @@ export default function ResetPasswordForm() {
         toast.error(data.error || "Could not reset password.");
       }
     } catch (err) {
-      console.error("Reset password error: ", err);
       toast.error("Error resetting password.");
     }
     setLoading(false);

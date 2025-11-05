@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // GET a single product by ID (public)
 import prisma from "@/lib/prismadb";
 import { NextRequest, NextResponse } from "next/server";
@@ -21,7 +22,6 @@ export async function GET(
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error("Error fetching product:", error);
     return NextResponse.json(
       { error: "Error fetching product" },
       { status: 500 }

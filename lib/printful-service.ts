@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Interface for createSyncProduct parameters (replaces the inline object)
 interface CreateSyncProductParams {
@@ -70,7 +71,6 @@ class PrintfulService {
 
     if (!res.ok) {
       const errorText = await res.text();
-      console.error(`Printful API error (${res.status}):`, errorText);
       throw new Error(`Printful API error: ${res.status} - ${errorText}`);
     }
 
@@ -104,7 +104,6 @@ class PrintfulService {
         try {
           designFileId = await this.uploadDesignFile(designData.designFile);
         } catch (error) {
-          console.error("Failed to upload design file: ", error);
           throw new Error("Design upload failed");
         }
       }
@@ -174,7 +173,6 @@ class PrintfulService {
         message: "Product created",
       };
     } catch (error) {
-      console.error("Printful product creation failed: ", error);
       return { success: false, message: "Product creation failed" };
     }
   }
@@ -315,7 +313,6 @@ class PrintfulService {
 
       throw new Error("Mockup generation timed out");
     } catch (error) {
-      console.error("Mockup generation error:", error);
       return [];
     }
   }
@@ -348,7 +345,6 @@ class PrintfulService {
         throw new Error(`No matching variant found for ${size} ${color}`);
       }
     } catch (error) {
-      console.error("Error fetching variants: ", error);
       throw new Error("Failed to fetch variants");
     }
   }

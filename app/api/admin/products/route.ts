@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // GET all products with admin data, POST to create
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -50,7 +51,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ products, total, page, limit });
   } catch (error) {
-    console.error("Error fetching products:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -141,9 +141,8 @@ export async function POST(req: NextRequest) {
 
         printfulSyncProductId = printfulProduct.id;
       } catch (error) {
-        console.error("Printful sync failed:", error);
         return NextResponse.json(
-          { error: `Failed to create Printful product: ${error}` },
+          { error: `Failed to create Printful product` },
           { status: 500 }
         );
       }
@@ -167,9 +166,8 @@ export async function POST(req: NextRequest) {
 
         printfulSyncProductId = printfulProduct.id;
       } catch (error) {
-        console.error("Printful sync failed: ", error);
         return NextResponse.json(
-          { error: `Failed to create Printful product: ${error}` },
+          { error: `Failed to create Printful product` },
           { status: 500 }
         );
       }
@@ -197,8 +195,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
-    console.error("Error creating product:", error);
-
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 }

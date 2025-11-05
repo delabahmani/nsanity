@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -25,7 +26,6 @@ export default function EditProductPage() {
         const data = await res.json();
         setProducts(data.products);
       } catch (err) {
-        console.error("Error fetching products:", err);
         setError("Failed to load products. Please try again.");
       } finally {
         setIsLoading(false);
@@ -40,8 +40,7 @@ export default function EditProductPage() {
     // Refetch without setting loading state
     fetch("/api/admin/products")
       .then((res) => res.json())
-      .then((data) => setProducts(data.products || []))
-      .catch((err) => console.error("Error refreshing products:", err));
+      .then((data) => setProducts(data.products || []));
   };
 
   if (isLoading) {

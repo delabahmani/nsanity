@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
@@ -63,7 +64,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error("Change password error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

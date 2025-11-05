@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { printfulService } from "@/lib/printful-service";
 import prisma from "@/lib/prismadb";
@@ -39,7 +40,6 @@ export async function GET(
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error("Error fetching product", error);
     return NextResponse.json(
       { error: "Failed to fetch product" },
       { status: 500 }
@@ -128,10 +128,7 @@ export async function PATCH(
             }))
           ),
         });
-        console.log("Printful sync completed successfuly");
-      } catch (printfulError) {
-        console.error("Printful sync failed (non-critical): ", printfulError);
-      }
+      } catch (printfulError) {}
     }
 
     const updatedProduct = await prisma.product.update({
@@ -152,7 +149,6 @@ export async function PATCH(
 
     return NextResponse.json(updatedProduct);
   } catch (error: unknown) {
-    console.error("Error updating product:", error);
 
     if (typeof error === "object" && error !== null && "code" in error)
       if (error.code === "P2025") {
@@ -201,7 +197,6 @@ export async function DELETE(
           active: false,
         });
       } catch {
-        console.error("Stripe product archiving failed");
         return NextResponse.json(
           { error: "Failed to archive product in payment system" },
           { status: 500 }
@@ -214,7 +209,6 @@ export async function DELETE(
       try {
         await printfulService.deleteSyncProduct(product.printfulSyncProductId);
       } catch (printfulError) {
-        console.error("Printful deletion error (non-critical):", printfulError);
       }
     }
 
@@ -223,7 +217,6 @@ export async function DELETE(
       try {
         await deleteUploadThingFiles(product.images);
       } catch (uploadError) {
-        console.error("Product file deletion failed:", uploadError);
         return NextResponse.json(
           { error: "Failed to delete product files" },
           { status: 500 }
@@ -258,7 +251,6 @@ export async function DELETE(
         await Promise.all(updatePromises);
       }
     } catch (wishlistError) {
-      console.error("Wishlist cleanup failed:", wishlistError);
     }
 
     // Finally delete the product from database
@@ -274,7 +266,6 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error deleting product", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

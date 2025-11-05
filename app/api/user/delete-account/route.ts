@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
@@ -49,13 +50,11 @@ export async function DELETE() {
       where: { id: user.id },
     });
 
-    console.log("User account deleted successfully");
     return NextResponse.json({
       success: true,
       message: "Account deleted successfully",
     });
   } catch (error) {
-    console.error("Account deletion failed",  error);
     return NextResponse.json(
       { error: "Failed to delete account" },
       { status: 500 }

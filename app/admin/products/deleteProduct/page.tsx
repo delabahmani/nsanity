@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Button from "@/components/ui/Button";
@@ -30,7 +31,6 @@ export default function DeleteProductPage() {
         const data = await res.json();
         setProducts(data.products);
       } catch (error) {
-        console.error("Error fetching products:", error);
         setError("Failed to load products. Please try again.");
       } finally {
         setIsLoading(false);
@@ -63,7 +63,6 @@ export default function DeleteProductPage() {
       setProducts((prev) => prev.filter((product) => product.id !== id));
       toast.success("Product deleted successfully!");
     } catch (error) {
-      console.error("Error deleting product:", error);
       toast.error("Failed to delete product. Please try again.");
     } finally {
       setIsDeleting((prev) => ({ ...prev, [id]: false }));
@@ -99,7 +98,6 @@ export default function DeleteProductPage() {
         setProducts((prev) => prev.filter((product) => product.id !== id));
         successCount++;
       } catch (error) {
-        console.error(`Error deleting product ${id}: `, error);
         failureCount++;
       } finally {
         setIsDeleting((prev) => ({ ...prev, [id]: false }));

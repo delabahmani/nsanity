@@ -84,10 +84,6 @@ export default function OrderDetailsModal({
     window.print();
   };
 
-  const handleTrackOrder = () => {
-    console.log("Track order:", order.id);
-  };
-
   const handleCancelOrder = async () => {
     if (!confirm("Are you sure you want to cancel this order?")) return;
 
@@ -175,7 +171,7 @@ export default function OrderDetailsModal({
                     : ""
                 } min-w-0`}
               >
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <Image
                     src={
                       item.product?.images?.[0] || "/images/placeholder.webp"
@@ -188,7 +184,7 @@ export default function OrderDetailsModal({
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-sm md:text-base truncate break-words">
+                  <h4 className="font-medium text-sm md:text-base truncate wrap-break-word">
                     {item.product?.name || "Unknown Product"}
                   </h4>
                   <div className="flex flex-col md:flex-row gap-2 md:gap-4 mt-2 text-sm text-gray-600">
@@ -275,11 +271,7 @@ export default function OrderDetailsModal({
           >
             Print Receipt
           </Button>
-          <Button
-            variant="default"
-            className="w-full md:flex-1"
-            onClick={handleTrackOrder}
-          >
+          <Button variant="default" className="w-full md:flex-1" disabled>
             Track Order
           </Button>
           {order.status === "pending" && (

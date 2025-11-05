@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -34,7 +35,6 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         setFavorites(data.products || []);
       }
     } catch (error) {
-      console.error("Error fetching favorites: ", error);
     }
   }, [session]);
 

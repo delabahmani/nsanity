@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { OurFileRouter } from "@/app/api/uploadthing/core";
 import { generateReactHelpers } from "@uploadthing/react";
 import { useCallback, useState } from "react";
@@ -52,7 +53,6 @@ export default function useImageUpload() {
 
       return uploadResults ? uploadResults.map((file) => file.ufsUrl) : [];
     } catch (error) {
-      console.error("Upload failed:", error);
       toast.error("Upload failed. Please try again.");
       return [];
     }

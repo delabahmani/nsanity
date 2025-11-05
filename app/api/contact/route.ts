@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
@@ -76,7 +77,6 @@ export async function POST(req: NextRequest) {
       message: "Message sent successfully",
     });
   } catch (error) {
-    console.error("Contact form submission failed", error);
     return NextResponse.json(
       { error: "Failed to send message" },
       { status: 500 }

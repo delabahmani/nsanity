@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { signIn } from "next-auth/react";
@@ -51,7 +52,6 @@ export default function SignInForm() {
           toast.error(data.error);
         }
       } catch (registrationError) {
-        console.error("Registration failed:", registrationError);
         toast.error("Registration failed. Please try again.");
       }
     } else {
@@ -71,7 +71,6 @@ export default function SignInForm() {
           router.refresh();
         }
       } catch (signInError: unknown) {
-        console.error("Sign in failed:", signInError);
         const errorMessage =
           signInError instanceof Error
             ? signInError.message
@@ -102,7 +101,6 @@ export default function SignInForm() {
       }
     } catch (err) {
       toast.error("Error sending reset link.");
-      console.error("An error occurred during sign in: ", err);
     }
     setForgotLoading(false);
   };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -110,9 +111,8 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error("💥 Error fetching template:", error);
     return NextResponse.json(
-      { error: "Failed to fetch template", details: error },
+      { error: "Failed to fetch template" },
       { status: 500 }
     );
   }

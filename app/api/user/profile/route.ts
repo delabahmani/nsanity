@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
@@ -37,7 +38,6 @@ export async function GET() {
           ? JSON.parse(user.address)
           : user.address;
     } catch (e) {
-      console.error("Error parsing address:", e);
     }
   }
 
@@ -76,7 +76,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Profile updated successfully" });
   } catch (error) {
-    console.error("Profile update error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

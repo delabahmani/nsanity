@@ -82,8 +82,6 @@ export async function fulfillCheckout(sessionId: string) {
           size: item.size,
         })),
       });
-    } catch {
-      console.error("Order fulfillment email delivery failed");
-    }
+    } catch {}
   }
 }

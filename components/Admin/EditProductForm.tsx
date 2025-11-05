@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -147,7 +148,6 @@ export default function EditProductForm({
         router.refresh();
       }
     } catch (error) {
-      console.error("Error updating product:", error);
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);

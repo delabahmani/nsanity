@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -32,7 +33,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error proxying image:", error);
     return NextResponse.json(
       { error: "Failed to proxy image" },
       { status: 500 }

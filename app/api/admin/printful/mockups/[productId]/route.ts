@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
@@ -62,10 +63,6 @@ export async function POST(
       );
     }
 
-    console.log(
-      `Downloading ${printfulMockups.length} mockups from Printful...`
-    );
-
     // Download each mockup and re-upload to UploadThing
     const permanentUrls: string[] = [];
 
@@ -77,7 +74,6 @@ export async function POST(
         const response = await fetch(mockupUrl);
 
         if (!response.ok) {
-          console.error(`Failed to download mockup ${i}: ${response.status}`);
           continue;
         }
 
@@ -87,20 +83,12 @@ export async function POST(
         });
 
         // Upload to UploadThing
-        console.log(
-          `Uploading mockup ${i + 1}/${printfulMockups.length} to UploadThing...`
-        );
         const uploadResult = await utapi.uploadFiles([file]);
 
-        if (uploadResult[0]?.data?.url) {
-          permanentUrls.push(uploadResult[0].data.url);
-          console.log(`✓ Mockup ${i + 1} uploaded successfully`);
-        } else {
-          console.error(`Failed to upload mockup ${i} to UploadThing`);
+        if (uploadResult[0]?.data?.ufsUrl) {
+          permanentUrls.push(uploadResult[0].data.ufsUrl);
         }
-      } catch (error) {
-        console.error(`Error processing mockup ${i}:`, error);
-      }
+      } catch (error) {}
     }
 
     if (permanentUrls.length === 0) {
@@ -109,8 +97,6 @@ export async function POST(
         { status: 500 }
       );
     }
-
-    console.log(`Successfully uploaded ${permanentUrls.length} mockups`);
 
     // Update product in database with permanent UploadThing URLs
     const updatedProduct = await prisma.product.update({
@@ -133,7 +119,6 @@ export async function POST(
       product: updatedProduct,
     });
   } catch (error) {
-    console.error("Error fetching mockups:", error);
     return NextResponse.json(
       { error: "Failed to fetch mockups" },
       { status: 500 }

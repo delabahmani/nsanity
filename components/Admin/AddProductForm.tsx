@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -201,11 +202,9 @@ export default function AddProductContainer() {
           setPrintAreas(data.printAreas);
           setSelectedTemplate(data.product);
         } else {
-          console.error("Failed to fetch print areas: ", data.error);
           toast.error("Failed to load print areas");
         }
       } catch (error) {
-        console.error("Error fetching print areas: ", error);
         toast.error("Error loading print areas");
       } finally {
         setLoadingPrintAreas(false);
@@ -243,11 +242,9 @@ export default function AddProductContainer() {
             colors: [],
           }));
         } else {
-          console.error("Failed to fetch variants:", data.error);
           toast.error("Failed to load product variants");
         }
       } catch (error) {
-        console.error("Error fetching variants:", error);
         toast.error("Error loading product variants");
       } finally {
         setLoadingVariants(false);
@@ -398,7 +395,7 @@ export default function AddProductContainer() {
 
       // If we have a Printful product with design, upload the final canvas mockup
       if (finalDesignData && designFile && formData.printfulTemplateId) {
-        toast.loading("Uploading design mockup...", { id: "design-upload" });
+        toast.loading("Uploading design mockup...");
 
         try {
           if (!designCanvasRef.current) {
@@ -430,12 +427,6 @@ export default function AddProductContainer() {
             type: "image/png",
           });
 
-          console.log(
-            "Mockup file size:",
-            (mockupFile.size / 1024 / 1024).toFixed(2),
-            "MB"
-          );
-
           // Upload using UploadThing's startUpload
           const uploadResult = await startUpload([mockupFile]);
 
@@ -445,8 +436,7 @@ export default function AddProductContainer() {
 
           mockupImageUrl = uploadResult[0].ufsUrl;
 
-          console.log("Mockup uploaded:", mockupImageUrl);
-          toast.success("Design mockup uploaded!", { id: "design-upload" });
+          toast.success("Design mockup uploaded!");
 
           // Prepare design data with URL instead of base64
           designDataForAPI = {
@@ -458,11 +448,8 @@ export default function AddProductContainer() {
             printArea: printAreas![0],
             templateInfo: selectedTemplate,
           };
-        } catch (uploadError) {
-          console.error("Failed to upload mockup:", uploadError);
-          toast.error("Failed to upload design mockup", {
-            id: "design-upload",
-          });
+        } catch (e) {
+          toast.error("Failed to upload design mockup");
           setIsLoading(false);
           return;
         }
@@ -476,7 +463,7 @@ export default function AddProductContainer() {
       const productData = {
         ...formData,
         images: productImages,
-        designData: designDataForAPI, 
+        designData: designDataForAPI,
       };
 
       if (!formData.name) {
@@ -514,7 +501,7 @@ export default function AddProductContainer() {
       const { product } = await res.json();
 
       if (formData.printfulTemplateId && product.id) {
-        toast.loading("Generating Printful mockups...", { id: "mockups" });
+        toast.loading("Generating Printful mockups...");
 
         try {
           const mockupRes = await fetch(
@@ -527,20 +514,17 @@ export default function AddProductContainer() {
           const mockupData = await mockupRes.json();
 
           if (mockupData.success) {
-            toast.success("Mockups generated successfully!", { id: "mockups" });
+            toast.success("Mockups generated successfully!");
           } else if (mockupRes.status === 202) {
             toast.success(
               "Product created! Mockups will be available shortly.",
               { id: "mockups" }
             );
           } else {
-            toast.error("Mockups not ready yet", { id: "mockups" });
+            toast.error("Mockups not ready yet");
           }
-        } catch (mockupError) {
-          console.error("Error fetching mockups: ", mockupError);
-          toast.error("Product created, but mockups failed to load", {
-            id: "mockups",
-          });
+        } catch (e) {
+          toast.error("Product created, but mockups failed to load");
         }
       }
 
@@ -569,7 +553,6 @@ export default function AddProductContainer() {
       toast.success("Product created successfully!");
       router.push("/admin");
     } catch (error) {
-      console.error("Error creating product:", error);
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
@@ -586,19 +569,17 @@ export default function AddProductContainer() {
     setShowDesignCanvas(true);
     setFinalDesignData(null);
 
-    const toastId = toast.loading("Uploading artwork...");
     try {
       const upload = await startUpload([file]);
       if (!upload?.length) {
         throw new Error("Design upload failed");
       }
       setDesignArtworkUrl(upload[0].url);
-      toast.success("Artwork uploaded!", { id: toastId });
-    } catch (err) {
-      console.error("Artwork upload failed:", err);
+      toast.success("Artwork uploaded!");
+    } catch (e) {
       setDesignFile(null);
       setShowDesignCanvas(false);
-      toast.error("Failed to upload artwork", { id: toastId });
+      toast.error("Failed to upload artwork");
     }
   };
 

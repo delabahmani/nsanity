@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -50,7 +51,6 @@ export default function ProductClient({ product }: ProductClientProps) {
           setIsFavorited(isProductFavorited);
         }
       } catch (error) {
-        console.error("Error checking favorite status:", error);
       }
     };
 
@@ -99,7 +99,6 @@ export default function ProductClient({ product }: ProductClientProps) {
         throw new Error("Failed to update favorites");
       }
     } catch (error) {
-      console.error("Error updating favorites:", error);
       toast.error("Failed to update favorites");
     } finally {
       setFavoritesLoading(false);

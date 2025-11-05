@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -95,7 +96,6 @@ export async function GET(
       variantsBySize,
     });
   } catch (error) {
-    console.error("Error fetching template variants", error);
     return NextResponse.json(
       { error: "Failed to fetch template variants" },
       { status: 500 }

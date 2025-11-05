@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -77,7 +78,6 @@ export default function ProfilePage() {
           image: userData.image,
         });
       } catch (err) {
-        console.error("Error fetching user profile:", err);
         setError(err instanceof Error ? err.message : "Failed to load profile");
       } finally {
         setLoading(false);
@@ -130,9 +130,7 @@ export default function ProfilePage() {
       }
 
       setIsEditing(false);
-      console.log("Profile updated successfully");
     } catch (err) {
-      console.error("Error updating profile:", err);
       toast.error("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);

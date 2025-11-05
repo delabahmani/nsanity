@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { mapColorToCss, Product } from "@/lib/utils/product-utils";
@@ -54,7 +55,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         throw new Error("Failed to update favorites");
       }
     } catch (error) {
-      console.error("Error toggling favorites: ", error);
       toast.error("Failed to update favorites. Please try again");
     } finally {
       setIsLoading(false);
@@ -85,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       )}
 
       <div className="bg-nsanity-cream rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-xl">
-        <div className="relative h-96 w-full bg-[#FFFFFF] flex flex-shrink items-center justify-center p-6">
+        <div className="relative h-96 w-full bg-[#FFFFFF] flex shrink items-center justify-center p-6">
           <div className="relative h-full w-full flex items-center justify-center">
             <Image
               src={product.images[0] || "/images/placeholder.webp"}

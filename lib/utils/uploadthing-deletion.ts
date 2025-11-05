@@ -22,7 +22,6 @@ export async function deleteUploadThingFile(url: string): Promise<boolean> {
     await utapi.deleteFiles(fileKey);
     return true;
   } catch {
-    console.error("Error deleting file from UploadThing");
     return false;
   }
 }

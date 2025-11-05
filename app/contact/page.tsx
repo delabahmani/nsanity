@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Button from "@/components/ui/Button";
@@ -49,7 +50,6 @@ export default function Contact() {
         category: "general",
       });
     } catch (error) {
-      console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again");
     } finally {
       setIsSubmitting(false);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/options";
@@ -58,7 +59,6 @@ export async function GET() {
       message: deletedProductIds.length > 0 ? "Wishlist updated" : undefined,
     });
   } catch (error) {
-    console.error("Error fetching favorites: ", error);
     return NextResponse.json(
       { error: "Failed to fetch favorites" },
       { status: 500 }
@@ -114,7 +114,6 @@ export async function POST(req: NextRequest) {
       message: "Added to favorites",
     });
   } catch (error) {
-    console.error("Error adding to favorites: ", error);
     return NextResponse.json(
       { error: "Failed to add to favorites" },
       { status: 500 }
@@ -154,7 +153,6 @@ export async function DELETE(req: NextRequest) {
       message: "Removed from favorites",
     });
   } catch (error) {
-    console.error("Error removing from favorites: ", error);
     return NextResponse.json(
       { error: "Failed to remove from favorites" },
       { status: 500 }

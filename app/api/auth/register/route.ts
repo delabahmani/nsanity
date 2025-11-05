@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import prisma from "@/lib/prismadb";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -75,7 +76,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Registration error: ", error);
     return NextResponse.json(
       { error: "Something went wrong. Please try again." },
       { status: 500 }

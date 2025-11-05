@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import PrintButton from "@/components/PrintBtn";
 import prisma from "@/lib/prismadb";
 import Image from "next/image";
@@ -22,7 +23,6 @@ export default async function SuccessPage(props: {
       expand: ["line_items"],
     });
   } catch (error) {
-    console.error("Failed to fetch Stripe session:", error);
     return notFound();
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useSession } from "next-auth/react";
 import {
@@ -52,7 +53,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           const parsedCart = JSON.parse(storedCart);
           setCart(parsedCart);
         } catch (error) {
-          console.error("Error parsing localStorage cart:", error);
           setCart([]);
         }
       } else {
@@ -77,7 +77,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setCart([]);
       }
     } catch (error) {
-      console.error("Failed to load cart from database:", error);
       setCart([]);
     } finally {
       setIsLoading(false);
@@ -85,7 +84,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const saveCartToLocalStorage = useCallback(() => {
     if (!hasLoadedInitialCart) return;
 
@@ -104,9 +102,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         credentials: "include",
         body: JSON.stringify({ cart }),
       });
-    } catch (error) {
-      console.error("Failed to save cart to database:", error);
-    }
+    } catch (error) {}
   }, [cart, hasLoadedInitialCart]);
 
   // Only load cart on meaningful auth changes, not loading states
