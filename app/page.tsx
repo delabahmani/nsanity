@@ -1,4 +1,5 @@
 import FeaturedProducts from "@/components/Products/FeaturedProducts";
+import ModelMockup from "@/components/Products/ModelMockup";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,6 +42,8 @@ export default function Home() {
       </section>
 
       <FeaturedProducts />
+
+      <ModelMockup />
     </div>
   );
 }

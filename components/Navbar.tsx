@@ -93,7 +93,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                 href={"/auth/sign-in"}
                 className="text-sm font-semibold text-nsanity-black link-hover"
               >
-                sign in
+                SIGN IN
               </Link>
             )}
 
@@ -136,7 +136,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                           size={18}
                           className="text-nsanity-black/80"
                         />
-                        <span className="font-semibold">Your cart</span>
+                        <span className="font-semibold">your cart</span>
                         <span className="ml-2 text-xs bg-nsanity-cream text-nsanity-black/70 px-2 py-0.5 rounded-full">
                           {cartCount} {cartCount === 1 ? "item" : "items"}
                         </span>
@@ -159,16 +159,16 @@ export default function Navbar({ session }: { session: Session | null }) {
                             className="text-nsanity-black/70"
                           />
                         </div>
-                        <p className="font-semibold">Your cart is empty</p>
+                        <p className="font-semibold">your cart is empty</p>
                         <p className="text-sm text-nsanity-black/70 mt-1">
-                          Start adding products to see them here.
+                          start adding products to see them here.
                         </p>
                         <Link
                           href="/products"
                           onClick={() => setCartOpen(false)}
                         >
                           <Button variant="primary" size="sm" className="mt-4">
-                            Browse products
+                            browse products
                           </Button>
                         </Link>
                       </div>
@@ -256,7 +256,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                         <div className="px-4 py-4 border-t border-nsanity-gray/30 bg-white sticky bottom-0">
                           <div className="flex items-center justify-between text-sm mb-3">
                             <span className="text-nsanity-black/70">
-                              Subtotal
+                              subtotal
                             </span>
                             <span className="font-semibold">
                               ${subtotal.toFixed(2)}
@@ -267,7 +267,7 @@ export default function Navbar({ session }: { session: Session | null }) {
                             onClick={() => setCartOpen(false)}
                           >
                             <Button variant="primary" className="w-full">
-                              Proceed to checkout
+                              proceed to checkout
                             </Button>
                           </Link>
                         </div>

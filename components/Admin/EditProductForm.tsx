@@ -7,6 +7,7 @@ import useImageUpload from "@/hooks/useImageUpload";
 import FileUploader from "./FileUploader";
 import { Product } from "@/lib/utils/product-utils";
 import Image from "next/image";
+import { canonicalizeCategory } from "@/lib/printful-features";
 
 interface EditProductFormProps {
   initialData: Product;
@@ -20,6 +21,10 @@ export default function EditProductForm({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
+  const normalizedInitialCategories = Array.from(
+    new Set((initialData.categories || []).map(canonicalizeCategory))
+  );
+
   // Form state
   const [formData, setFormData] = useState({
     name: initialData.name,
@@ -27,7 +32,7 @@ export default function EditProductForm({
     price: initialData.price,
     colors: initialData.colors || [],
     images: initialData.images || [],
-    categories: initialData.categories || [],
+    categories: normalizedInitialCategories,
     sizes: initialData.sizes || [],
     inStock: initialData.inStock,
     isFeatured: initialData.isFeatured,
@@ -74,10 +79,12 @@ export default function EditProductForm({
     const value = inputs[type].trim();
     if (!value) return;
 
-    if (!formData[type].includes(value)) {
+    const token = type === "categories" ? canonicalizeCategory(value) : value;
+
+    if (!formData[type].includes(token)) {
       setFormData((prev) => ({
         ...prev,
-        [type]: [...prev[type], value],
+        [type]: [...prev[type], token],
       }));
     }
 
@@ -112,6 +119,9 @@ export default function EditProductForm({
 
       const productData = {
         ...formData,
+        categories: Array.from(
+          new Set(formData.categories.map(canonicalizeCategory))
+        ),
         images: imageUrls,
       };
 

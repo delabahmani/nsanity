@@ -101,7 +101,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
                   role="menuitem"
                 >
                   <User size={16} className="text-nsanity-black/70" />
-                  <span>Profile</span>
+                  <span>profile</span>
                 </Link>
               </li>
 
@@ -117,7 +117,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
                       size={16}
                       className="text-nsanity-black/70"
                     />
-                    <span>Admin</span>
+                    <span>admin</span>
                   </Link>
                 </li>
               )}
@@ -130,7 +130,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
                   role="menuitem"
                 >
                   <Settings size={16} className="text-nsanity-black/70" />
-                  <span>Settings</span>
+                  <span>settings</span>
                 </Link>
               </li>
 
@@ -146,7 +146,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
                   role="menuitem"
                 >
                   <LogOut size={16} className="text-nsanity-black/70" />
-                  <span>Sign out</span>
+                  <span>sign out</span>
                 </button>
               </li>
             </ul>

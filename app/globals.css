@@ -155,6 +155,38 @@
   }
 }
 
+.btn-primary {
+  background: radial-gradient(
+    circle at 50% 50%,
+    #ff914d 0%,
+    #ff7f4d 100%,
+    #ff9f4d 100%
+  );
+  border: 1px solid #e46533;
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.03),
+    0 6px 18px rgba(16, 16, 16, 0.03);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    filter 120ms ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.03);
+  box-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.04),
+    0 10px 24px rgba(16, 16, 16, 0.06);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
 .link-hover {
   @apply lg:hover:text-nsanity-orange  lg:transition-all lg:duration-200;
 }

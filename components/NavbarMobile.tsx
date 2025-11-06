@@ -131,7 +131,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
         >
           <div className="flex items-center gap-2">
             <ShoppingBasket size={24} className="text-nsanity-black" />
-            <span className="font-semibold text-lg">Cart</span>
+            <span className="font-semibold text-lg">cart</span>
           </div>
           {cartCount > 0 && (
             <span className="bg-nsanity-orange text-nsanity-black text-sm rounded-full h-6 w-6 font-bold flex items-center justify-center ml-3">
@@ -203,7 +203,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
                 className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-nsanity-cream transition text-left"
               >
                 <LogOut size={20} className="text-nsanity-black/70" />
-                <span className="font-medium">Sign out</span>
+                <span className="font-medium">sign out</span>
               </button>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
               }}
               className="w-full"
             >
-              Sign In
+              sign In
             </Button>
           </div>
         )}

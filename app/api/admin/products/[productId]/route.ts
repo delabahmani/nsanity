@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import { canonicalizeCategory } from "@/lib/printful-features";
 import { printfulService } from "@/lib/printful-service";
 import prisma from "@/lib/prismadb";
 import { deleteUploadThingFiles } from "@/lib/utils/uploadthing-deletion";
@@ -138,7 +139,7 @@ export async function PATCH(
         price,
         description,
         colors,
-        categories,
+        categories: categories.map(canonicalizeCategory),
         sizes,
         inStock,
         isFeatured,
@@ -149,7 +150,6 @@ export async function PATCH(
 
     return NextResponse.json(updatedProduct);
   } catch (error: unknown) {
-
     if (typeof error === "object" && error !== null && "code" in error)
       if (error.code === "P2025") {
         return NextResponse.json(
@@ -208,8 +208,7 @@ export async function DELETE(
     if (product.printfulSyncProductId) {
       try {
         await printfulService.deleteSyncProduct(product.printfulSyncProductId);
-      } catch (printfulError) {
-      }
+      } catch (printfulError) {}
     }
 
     // Delete files from uploadthing before database
@@ -250,8 +249,7 @@ export async function DELETE(
 
         await Promise.all(updatePromises);
       }
-    } catch (wishlistError) {
-    }
+    } catch (wishlistError) {}
 
     // Finally delete the product from database
     await prisma.product.delete({

@@ -12,10 +12,9 @@ export default async function FeaturedProducts() {
   return (
     <section className="py-16 relative z-20 mt-16 md:mt-24 lg:mt-30">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center">featured pieces</h2>
+        <h2 className="sm:text-4xl text-2xl font-bold text-center">featured pieces</h2>
         <p className="text-center text-nsanity-black/50 mt-2">
-          handpicked selections from our latest collection, designed for those
-          who dare to stand out
+          the ones we&apos;d buy for ourselves
         </p>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

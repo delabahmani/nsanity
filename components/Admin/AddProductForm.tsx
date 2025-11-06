@@ -462,6 +462,9 @@ export default function AddProductContainer() {
 
       const productData = {
         ...formData,
+        categories: Array.from(
+          new Set(formData.categories.map(canonicalizeCategory))
+        ),
         images: productImages,
         designData: designDataForAPI,
       };

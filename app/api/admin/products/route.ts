@@ -7,6 +7,7 @@ import prisma from "@/lib/prismadb";
 import Stripe from "stripe";
 import { Prisma } from "@prisma/client";
 import { printfulService } from "@/lib/printful-service";
+import { canonicalizeCategory } from "@/lib/printful-features";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
@@ -179,7 +180,7 @@ export async function POST(req: NextRequest) {
         price,
         description,
         colors,
-        categories,
+        categories: categories.map(canonicalizeCategory),
         inStock,
         isFeatured,
         sizes,

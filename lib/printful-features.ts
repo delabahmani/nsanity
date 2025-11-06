@@ -227,32 +227,32 @@ export const PRINTFUL_SIZE_GUIDES: Record<number, SizeGuideEntry[]> = {
 // Category Helper
 export const CATEGORY_ALIASES: Record<string, string> = {
   // tees
-  tshirt: "tshirt",
-  tshirts: "tshirt",
-  tee: "tshirt",
-  unisextshirt: "tshirt",
-  unisextee: "tshirt",
-  tshirtunisex: "tshirt",
+  tshirt: "T-Shirt",
+  tshirts: "T-Shirt",
+  tee: "T-Shirt",
+  unisextshirt: "T-Shirt",
+  unisextee: "T-Shirt",
+  tshirtunisex: "T-Shirt",
   // hoodies
-  hoodie: "hoodie",
-  hoodies: "hoodie",
-  pulloverhoodie: "hoodie",
+  hoodie: "Hoodie",
+  hoodies: "Hoodie",
+  pulloverhoodie: "Hoodie",
   // crewneck
-  crewneck: "crewneck",
-  crewnecks: "crewneck",
-  sweatshirt: "crewneck",
-  crewnecksweatshirt: "crewneck",
+  crewneck: "Crewneck",
+  crewnecks: "Crewneck",
+  sweatshirt: "Crewneck",
+  crewnecksweatshirt: "Crewneck",
   // muscle
-  muscletee: "muscletee",
-  muscleshirt: "muscletee",
-  tank: "muscletee",
+  muscletee: "Muscle-Tee",
+  muscleshirt: "Muscle-Tee",
+  tank: "Muscle-Tee",
   // caps/hats
-  cap: "cap",
-  caps: "cap",
-  hat: "cap",
-  hats: "cap",
-  corduroycap: "cap",
-  vintagecorduroycap: "cap",
+  cap: "Cap",
+  caps: "Cap",
+  hat: "Cap",
+  hats: "Cap",
+  corduroycap: "Cap",
+  vintagecorduroycap: "Cap",
 };
 
 export const SUPPORTED_GUIDE_CATEGORIES = [

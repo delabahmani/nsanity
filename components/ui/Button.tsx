@@ -30,7 +30,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant === "default" &&
         "bg-nsanity-cream text-nsanity-black hover:scale-[1.01] transition-all duration-200 shadow-sm",
       variant === "primary" &&
-        "bg-nsanity-darkorange text-nsanity-cream hover:scale-[1.01] transition-all duration-200 shadow-md border-2 border-nsanity-orange",
+        "btn-primary text-nsanity-cream hover:scale-[1.01] transition-all duration-200 shadow-md",
       variant === "link" &&
         "text-nsanity-black hover:scale-[1.01] bg-nsanity-cream backdrop-blur-lg transition-all duration-200 shadow-md",
       variant === "danger" &&

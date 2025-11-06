@@ -2,15 +2,15 @@ import ProductsContainer from "@/components/Products/ProductsContainer";
 import { getAllProducts } from "@/lib/utils/product-utils";
 
 export const metadata = {
-  title: "Products | nsanity",
-  description: "Browse our collection of products",
+  title: "products | nsanity",
+  description: "browse our collection of products",
 };
 
 export default async function Products() {
   const products = await getAllProducts();
 
   if (!products) {
-    return <div>Products not found</div>;
+    return <div>products not found</div>;
   }
 
   return (
