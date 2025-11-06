@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 import { ArrowLeft, Heart, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { Product } from "@/lib/utils/product-utils";
+import { mapColorToCss, Product } from "@/lib/utils/product-utils";
 import SizeGuideModal from "@/components/Products/SizeGuideModal";
 import { pickGuideCategory } from "@/lib/printful-features";
 import { useRouter } from "next/navigation";
@@ -50,8 +50,7 @@ export default function ProductClient({ product }: ProductClientProps) {
           );
           setIsFavorited(isProductFavorited);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     checkFavoriteStatus();
@@ -71,7 +70,7 @@ export default function ProductClient({ product }: ProductClientProps) {
       color: selectedColor,
       image: product.images[0],
     });
-    toast.success("Item added to cart!")
+    toast.success("Item added to cart!");
   };
 
   const handleToggleFavorite = async () => {
@@ -103,37 +102,6 @@ export default function ProductClient({ product }: ProductClientProps) {
     } finally {
       setFavoritesLoading(false);
     }
-  };
-
-  const mapColorToCss = (color: string): string => {
-    const colorMap: Record<string, string> = {
-      Ash: "#B2BEB5",
-      Black: "black",
-      "Carolina Blue": "#4B9CD3",
-      Charcoal: "dimgray",
-      "Dark Chocolate": "saddlebrown",
-      "Dark Heather": "darkgray",
-      "Forest Green": "forestgreen",
-      Gold: "gold",
-      "Graphite Heather": "gray",
-      "Heather Deep Royal": "#4169E1",
-      Heliconia: "hotpink",
-      "Indigo Blue": "indigo",
-      "Irish Green": "green",
-      "Light Blue": "lightblue",
-      "Light Pink": "lightpink",
-      Maroon: "maroon",
-      "Military Green": "darkolivegreen",
-      Navy: "navy",
-      Orange: "orange",
-      Purple: "purple",
-      Red: "red",
-      Royal: "royalblue",
-      Sand: "sandybrown",
-      "Sport Grey": "lightgray",
-      White: "white",
-    };
-    return colorMap[color] || "#D3D3D3"; // Fallback to light gray
   };
 
   return (
