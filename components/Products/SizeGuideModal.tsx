@@ -19,7 +19,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
     templateId: number;
   }
 > = {
-  tshirt: {
+  "T-Shirt": {
     name: "Unisex Classic Tee",
     diagram: "/images/tee-sizeguide.png",
     templateId: 438,
@@ -38,7 +38,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  hoodie: {
+  "Hoodie": {
     name: "Heavy Blend Hoodie",
     diagram: "/images/hoodie-sizeguide.png",
     templateId: 146,
@@ -57,7 +57,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  crewneck: {
+  "Crewneck": {
     name: "Heavy Blend Crewneck Sweatshirt",
     diagram: "/images/crew-sizeguide.png",
     templateId: 145,
@@ -76,7 +76,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  muscletee: {
+  "Muscle-Tee": {
     name: "Unisex Muscle Tee",
     diagram: "/images/muscle-sizeguide.png",
     templateId: 365,
@@ -91,7 +91,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  cap: {
+  "Cap": {
     name: "Vintage Corduroy Cap",
     diagram: "/images/cap-sizeguide.png",
     templateId: 662,
