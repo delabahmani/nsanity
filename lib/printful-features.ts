@@ -238,10 +238,10 @@ export const CATEGORY_ALIASES: Record<string, string> = {
   hoodies: "Hoodie",
   pulloverhoodie: "Hoodie",
   // crewneck
-  crewneck: "Crewneck",
-  crewnecks: "Crewneck",
-  sweatshirt: "Crewneck",
-  crewnecksweatshirt: "Crewneck",
+  crewneck: "crewneck",
+  crewnecks: "crewneck",
+  sweatshirt: "crewneck",
+  crewnecksweatshirt: "crewneck",
   // muscle
   muscletee: "Muscle-Tee",
   muscleshirt: "Muscle-Tee",
@@ -256,16 +256,16 @@ export const CATEGORY_ALIASES: Record<string, string> = {
 };
 
 export const SUPPORTED_GUIDE_CATEGORIES = [
-  "tshirt",
-  "hoodie",
+  "T-Shirt",
+  "Hoodie",
   "crewneck",
-  "muscletee",
-  "cap",
+  "Muscle-Tee",
+  "Cap",
 ] as const;
 
-export function canonicalizeCategory(raw: string): string {
-  const key = raw.toLowerCase().replace(/[^a-z]/g, "");
-  return CATEGORY_ALIASES[key] ?? key;
+export function canonicalizeCategory(category: string): string {
+  const lower = category.toLowerCase();
+  return CATEGORY_ALIASES[lower] || category;
 }
 
 export function pickGuideCategory(categories: string[] = []): string | null {

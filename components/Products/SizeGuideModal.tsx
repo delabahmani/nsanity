@@ -38,7 +38,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  "Hoodie": {
+  Hoodie: {
     name: "Heavy Blend Hoodie",
     diagram: "/images/hoodie-sizeguide.png",
     templateId: 146,
@@ -57,7 +57,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  "Crewneck": {
+  crewneck: {
     name: "Heavy Blend Crewneck Sweatshirt",
     diagram: "/images/crew-sizeguide.png",
     templateId: 145,
@@ -91,7 +91,7 @@ const PRODUCT_GUIDES_BY_CATEGORY: Record<
       },
     ],
   },
-  "Cap": {
+  Cap: {
     name: "Vintage Corduroy Cap",
     diagram: "/images/cap-sizeguide.png",
     templateId: 662,
