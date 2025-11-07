@@ -1,4 +1,6 @@
+import LoadingSpinner from "@/components/LoadingSpinner";
 import ProfileClient from "@/components/Profile/ProfileClient";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "profile | nsanity",
@@ -6,5 +8,15 @@ export const metadata = {
 };
 
 export default function ProfilePage() {
-  return <ProfileClient />;
+  return (
+    <Suspense
+      fallback={
+        <div>
+          <LoadingSpinner size="large" />
+        </div>
+      }
+    >
+      <ProfileClient />
+    </Suspense>
+  );
 }
