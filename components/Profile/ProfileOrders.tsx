@@ -1,75 +1,20 @@
 "use client";
 
 import { Package } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../ui/Button";
 import OrderDetailsModal from "./OrderDetailsModal";
-
-interface OrderItem {
-  id: string;
-  productId: string;
-  quantity: number;
-  color: string;
-  size: string;
-  price: number;
-  product?: {
-    id: string;
-    name: string;
-    images: string[];
-  };
-}
-
-interface Order {
-  id: string;
-  orderCode?: string;
-  totalAmount: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  orderItems: OrderItem[];
-}
+import LoadingSpinner from "../LoadingSpinner";
+import { useOrders } from "@/lib/queries/orders";
 
 export default function ProfileOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const { data: orders = [], isLoading, error } = useOrders();
+  const [selectedOrder, setSelectedOrder] = useState<(typeof orders)[0] | null>(
+    null
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    async function fetchOrders() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const res = await fetch("/api/user/orders");
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch orders: ${res.status}`);
-        }
-
-        const data = await res.json();
-
-        setOrders(data.orders || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load orders");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchOrders();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="bg-nsanity-white rounded-xl shadow p-6">
-        <div className="animate-pulse">Loading orders...</div>
-      </div>
-    );
-  }
-
-  const handleViewDetails = (order: Order) => {
+  const handleViewDetails = (order: (typeof orders)[0]) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
@@ -79,13 +24,21 @@ export default function ProfileOrders() {
     setSelectedOrder(null);
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-nsanity-white rounded-xl shadow p-6">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="bg-nsanity-white rounded-xl shadow p-6">
         <h2 className="font-semibold text-lg flex items-center gap-2 mb-4 text-red-600">
           <Package className="w-5 h-5" /> Error Loading Orders
         </h2>
-        <div className="text-red-500">{error}</div>
+        <div className="text-red-500">Failed to load orders</div>
       </div>
     );
   }

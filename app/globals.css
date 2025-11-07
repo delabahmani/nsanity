@@ -195,7 +195,7 @@
 @keyframes modal-slide-up {
   0% {
     opacity: 0;
-    transform: translateY(30vh); /* 30% of viewport height */
+    transform: translateY(50vh); /* 30% of viewport height */
     scale: 0.5;
   }
 
@@ -232,31 +232,31 @@
   will-change: transform, opacity;
 }
 
-/* Backdrop animations */
-@keyframes backdrop-fade-in {
-  0% {
-    background-color: rgba(0, 0, 0, 0);
-  }
-  100% {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
-}
-
-@keyframes backdrop-fade-out {
-  0% {
-    background-color: rgba(0, 0, 0, 0.7);
-  }
-  100% {
-    background-color: rgba(0, 0, 0, 0);
-  }
-}
-
 .backdrop-fade-in {
   animation: backdrop-fade-in 0.5s ease-out forwards;
 }
 
 .backdrop-fade-out {
-  animation: backdrop-fade-out 0.4s ease-out forwards;
+  animation: backdrop-fade-out 0.5s ease-out forwards;
+}
+
+/* Backdrop animations */
+@keyframes backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes pop {
@@ -275,4 +275,8 @@
 }
 .animate-pop {
   animation: pop 0.3s cubic-bezier(0.36, 1.56, 0.64, 1) both;
+}
+
+html {
+  scrollbar-gutter: stable;
 }

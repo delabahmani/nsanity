@@ -1,4 +1,3 @@
-// ...existing code...
 import Image from "next/image";
 
 export default async function ModelMockup() {
@@ -20,14 +19,12 @@ export default async function ModelMockup() {
         </div>
 
         <div className="text-center md:text-left space-y-4 px-2 md:px-0">
-          <h1 className="text-2xl md:text-3xl font-bold">fearless design</h1>
+          <h1 className="text-2xl md:text-4xl font-bold">what&apos;s new</h1>
           <p className="text-base md:text-lg text-black/70 max-w-md mx-auto md:mx-0">
-            oifjdoigjiosdjgoifjgoifdj iogjsdiogjsodi iogjsdiogdjs gio jiosdgj
-            iodgj iosdgjio d
+            new drops are here. different designs, same energy.
           </p>
         </div>
       </div>
     </section>
   );
 }
-// ...existing code...

@@ -11,6 +11,7 @@ import ProfileBtn from "./ProfileBtn";
 import { Session } from "next-auth";
 import Button from "./ui/Button";
 import Logo from "./ui/Logo";
+import Container from "./ui/Container";
 
 export default function Navbar({ session }: { session: Session | null }) {
   const pathname = usePathname();
@@ -63,223 +64,229 @@ export default function Navbar({ session }: { session: Session | null }) {
 
   return (
     <header className="bg-nsanity-cream/90 fixed w-full z-50 backdrop-blur-md drop-shadow-sm hidden lg:block">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between py-6 px-4 lg:px-8">
-        <div className="flex lg:flex-1">
-          <Logo variant="navbar" />
-        </div>
+      <Container>
+        <nav className=" flex items-center justify-between py-6 ">
+          <div className="flex lg:flex-1">
+            <Logo variant="navbar" />
+          </div>
 
-        <div className="hidden lg:flex lg:gap-x-12">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`text-base font-semibold ${
-                path === item.href
-                  ? "text-nsanity-orange"
-                  : "text-nsanity-black"
-              } link-hover `}
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
-          <div className="lg:flex lg:gap-x-6 hidden lg:items-center">
-            {session ? (
-              <ProfileBtn session={session} />
-            ) : (
+          <div className="hidden lg:flex lg:gap-x-12">
+            {navigation.map((item) => (
               <Link
-                href={"/auth/sign-in"}
-                className="text-sm font-semibold text-nsanity-black link-hover"
+                key={item.name}
+                href={item.href}
+                className={`text-base font-semibold ${
+                  path === item.href
+                    ? "text-nsanity-orange"
+                    : "text-nsanity-black"
+                } link-hover `}
               >
-                SIGN IN
+                {item.name}
               </Link>
-            )}
+            ))}
+          </div>
 
-            {/* Mini Cart */}
-            <div className="relative">
-              <Button
-                className="text-sm font-semibold leading-6 text-nsanity-black relative"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setCartOpen((open) => !open);
-                }}
-                aria-label="Open cart"
-                variant="ghost"
-              >
-                <ShoppingBasket className="link-hover" size={28} />
-                {cart.length > 0 && (
-                  <span
-                    className={`absolute -top-2 -right-2 bg-nsanity-orange text-nsanity-black text-sm rounded-full h-6 w-6 font-bold flex items-center justify-center transition-transform ${
-                      pop ? "animate-pop" : ""
-                    }`}
-                  >
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
-
-              {cartOpen && (
-                <div
-                  ref={cartRef}
-                  className="absolute right-0 mt-3 w-[420px] max-w-[90vw] z-50"
+          <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
+            <div className="lg:flex lg:gap-x-6 hidden lg:items-center">
+              {session ? (
+                <ProfileBtn session={session} />
+              ) : (
+                <Link
+                  href={"/auth/sign-in"}
+                  className="text-sm font-semibold text-nsanity-black link-hover"
                 >
-                  {/* Pointer */}
-                  <div className="absolute right-[22px] -top-2 h-4 w-4 rotate-45 bg-white border border-nsanity-gray/40 shadow-sm" />
+                  SIGN IN
+                </Link>
+              )}
 
-                  <div className="relative rounded-2xl border border-nsanity-gray/40 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-nsanity-gray/30 bg-nsanity-cream/60">
-                      <div className="flex items-center gap-2">
-                        <ShoppingCart
-                          size={18}
-                          className="text-nsanity-black/80"
-                        />
-                        <span className="font-semibold">your cart</span>
-                        <span className="ml-2 text-xs bg-nsanity-cream text-nsanity-black/70 px-2 py-0.5 rounded-full">
-                          {cartCount} {cartCount === 1 ? "item" : "items"}
-                        </span>
-                      </div>
-                      <button
-                        aria-label="Close cart"
-                        onClick={() => setCartOpen(false)}
-                        className="p-1.5 rounded-md hover:bg-nsanity-cream transition"
-                      >
-                        <X size={18} />
-                      </button>
-                    </div>
+              {/* Mini Cart */}
+              <div className="relative">
+                <Button
+                  className="text-sm font-semibold leading-6 text-nsanity-black relative"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCartOpen((open) => !open);
+                  }}
+                  aria-label="Open cart"
+                  variant="ghost"
+                >
+                  <ShoppingBasket className="link-hover" size={28} />
+                  {cart.length > 0 && (
+                    <span
+                      className={`absolute -top-2 -right-2 bg-nsanity-orange text-nsanity-black text-sm rounded-full h-6 w-6 font-bold flex items-center justify-center transition-transform ${
+                        pop ? "animate-pop" : ""
+                      }`}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
 
-                    {/* Items */}
-                    {cart.length === 0 ? (
-                      <div className="px-6 py-10 text-center flex flex-col items-center justify-center">
-                        <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-nsanity-cream flex items-center justify-center">
+                {cartOpen && (
+                  <div
+                    ref={cartRef}
+                    className="absolute right-0 mt-3 w-[420px] max-w-[90vw] z-50"
+                  >
+                    {/* Pointer */}
+                    <div className="absolute right-[22px] -top-2 h-4 w-4 rotate-45 bg-white border border-nsanity-gray/40 shadow-sm" />
+
+                    <div className="relative rounded-2xl border border-nsanity-gray/40 bg-white shadow-xl ring-1 ring-black/5 overflow-hidden">
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 py-3 border-b border-nsanity-gray/30 bg-nsanity-cream/60">
+                        <div className="flex items-center gap-2">
                           <ShoppingCart
                             size={18}
-                            className="text-nsanity-black/70"
+                            className="text-nsanity-black/80"
                           />
+                          <span className="font-semibold">your cart</span>
+                          <span className="ml-2 text-xs bg-nsanity-cream text-nsanity-black/70 px-2 py-0.5 rounded-full">
+                            {cartCount} {cartCount === 1 ? "item" : "items"}
+                          </span>
                         </div>
-                        <p className="font-semibold">your cart is empty</p>
-                        <p className="text-sm text-nsanity-black/70 mt-1">
-                          start adding products to see them here.
-                        </p>
-                        <Link
-                          href="/products"
+                        <button
+                          aria-label="Close cart"
                           onClick={() => setCartOpen(false)}
+                          className="p-1.5 rounded-md hover:bg-nsanity-cream transition"
                         >
-                          <Button variant="primary" size="sm" className="mt-4">
-                            browse products
-                          </Button>
-                        </Link>
+                          <X size={18} />
+                        </button>
                       </div>
-                    ) : (
-                      <>
-                        <div className="max-h-80 overflow-y-auto px-4 py-3 divide-y divide-gray-100">
-                          {cart.map((item) => (
-                            <div
-                              key={
-                                item.productId +
-                                (item.size ?? "") +
-                                (item.color ?? "")
-                              }
-                              className="py-3 first:pt-0 last:pb-0"
-                            >
-                              <div className="grid grid-cols-[64px_1fr_auto] gap-3 items-start">
-                                <div className="h-16 w-16 rounded-lg overflow-hidden border bg-nsanity-cream">
-                                  <Image
-                                    src={
-                                      item.image || "/images/placeholder.webp"
-                                    }
-                                    alt={item.name}
-                                    width={64}
-                                    height={64}
-                                    quality={100}
-                                    className="h-full w-full object-cover"
-                                  />
-                                </div>
 
-                                <div className="min-w-0">
-                                  <p className="font-semibold truncate">
-                                    {item.name}
-                                  </p>
-                                  <p className="text-sm text-nsanity-black/70">
-                                    Size: {item.size || "-"} • Color:{" "}
-                                    {item.color || "-"}
-                                  </p>
-
-                                  <div className="mt-2 flex items-center gap-2">
-                                    <QuantitySelector
-                                      initialValue={item.quantity}
-                                      min={1}
-                                      max={10}
-                                      size="sm"
-                                      onChange={(q) =>
-                                        updateQuantity(
-                                          item.productId,
-                                          q,
-                                          item.size,
-                                          item.color
-                                        )
-                                      }
-                                    />
-                                    <button
-                                      className="p-2 rounded-md hover:bg-nsanity-cream transition"
-                                      onClick={() =>
-                                        removeFromCart(
-                                          item.productId,
-                                          item.size,
-                                          item.color
-                                        )
-                                      }
-                                      aria-label="Remove item"
-                                      title="Remove"
-                                    >
-                                      <Trash2
-                                        size={18}
-                                        className="text-nsanity-black/65 hover:text-nsanity-red"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-
-                                <div className="text-right">
-                                  <div className="font-semibold">
-                                    ${(item.price * item.quantity).toFixed(2)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Footer / Summary */}
-                        <div className="px-4 py-4 border-t border-nsanity-gray/30 bg-white sticky bottom-0">
-                          <div className="flex items-center justify-between text-sm mb-3">
-                            <span className="text-nsanity-black/70">
-                              subtotal
-                            </span>
-                            <span className="font-semibold">
-                              ${subtotal.toFixed(2)}
-                            </span>
+                      {/* Items */}
+                      {cart.length === 0 ? (
+                        <div className="px-6 py-10 text-center flex flex-col items-center justify-center">
+                          <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-nsanity-cream flex items-center justify-center">
+                            <ShoppingCart
+                              size={18}
+                              className="text-nsanity-black/70"
+                            />
                           </div>
+                          <p className="font-semibold">your cart is empty</p>
+                          <p className="text-sm text-nsanity-black/70 mt-1">
+                            start adding products to see them here.
+                          </p>
                           <Link
-                            href={"/cart"}
+                            href="/products"
                             onClick={() => setCartOpen(false)}
                           >
-                            <Button variant="primary" className="w-full">
-                              proceed to checkout
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="mt-4"
+                            >
+                              browse products
                             </Button>
                           </Link>
                         </div>
-                      </>
-                    )}
+                      ) : (
+                        <>
+                          <div className="max-h-80 overflow-y-auto px-4 py-3 divide-y divide-gray-100">
+                            {cart.map((item) => (
+                              <div
+                                key={
+                                  item.productId +
+                                  (item.size ?? "") +
+                                  (item.color ?? "")
+                                }
+                                className="py-3 first:pt-0 last:pb-0"
+                              >
+                                <div className="grid grid-cols-[64px_1fr_auto] gap-3 items-start">
+                                  <div className="h-16 w-16 rounded-lg overflow-hidden border bg-nsanity-cream">
+                                    <Image
+                                      src={
+                                        item.image || "/images/placeholder.webp"
+                                      }
+                                      alt={item.name}
+                                      width={64}
+                                      height={64}
+                                      quality={100}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </div>
+
+                                  <div className="min-w-0">
+                                    <p className="font-semibold truncate">
+                                      {item.name}
+                                    </p>
+                                    <p className="text-sm text-nsanity-black/70">
+                                      Size: {item.size || "-"} • Color:{" "}
+                                      {item.color || "-"}
+                                    </p>
+
+                                    <div className="mt-2 flex items-center gap-2">
+                                      <QuantitySelector
+                                        initialValue={item.quantity}
+                                        min={1}
+                                        max={10}
+                                        size="sm"
+                                        onChange={(q) =>
+                                          updateQuantity(
+                                            item.productId,
+                                            q,
+                                            item.size,
+                                            item.color
+                                          )
+                                        }
+                                      />
+                                      <button
+                                        className="p-2 rounded-md hover:bg-nsanity-cream transition"
+                                        onClick={() =>
+                                          removeFromCart(
+                                            item.productId,
+                                            item.size,
+                                            item.color
+                                          )
+                                        }
+                                        aria-label="Remove item"
+                                        title="Remove"
+                                      >
+                                        <Trash2
+                                          size={18}
+                                          className="text-nsanity-black/65 hover:text-nsanity-red"
+                                        />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="text-right">
+                                    <div className="font-semibold">
+                                      ${(item.price * item.quantity).toFixed(2)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Footer / Summary */}
+                          <div className="px-4 py-4 border-t border-nsanity-gray/30 bg-white sticky bottom-0">
+                            <div className="flex items-center justify-between text-sm mb-3">
+                              <span className="text-nsanity-black/70">
+                                subtotal
+                              </span>
+                              <span className="font-semibold">
+                                ${subtotal.toFixed(2)}
+                              </span>
+                            </div>
+                            <Link
+                              href={"/cart"}
+                              onClick={() => setCartOpen(false)}
+                            >
+                              <Button variant="primary" className="w-full">
+                                proceed to checkout
+                              </Button>
+                            </Link>
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </Container>
     </header>
   );
 }

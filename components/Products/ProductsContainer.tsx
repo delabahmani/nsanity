@@ -1,19 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Product } from "@/lib/utils/product-utils";
 import ProductFilters from "./ProductFilters";
 import ProductGrid from "./ProductGrid";
 import { X } from "lucide-react";
+import { useProducts } from "@/lib/queries/products";
+import LoadingSpinner from "../LoadingSpinner";
 
-interface ProductsContainerProps {
-  products: Product[];
-}
+export default function ProductsContainer() {
+  const { data: products = [], isLoading, error, isError } = useProducts();
 
-export default function ProductsContainer({
-  products,
-}: ProductsContainerProps) {
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [activeFilters, setActiveFilters] = useState<{
     categories: string[];
     sizes: string[];
@@ -22,36 +19,87 @@ export default function ProductsContainer({
     sizes: [],
   });
 
+  const filteredProducts = useMemo(() => {
+    if (!activeFilters.categories.length && !activeFilters.sizes.length) {
+      return products;
+    }
+
+    return products.filter((product) => {
+      const matchesCategory =
+        !activeFilters.categories.length ||
+        product.categories?.some((cat) =>
+          activeFilters.categories.includes(cat)
+        );
+
+      const matchesSize =
+        !activeFilters.sizes.length ||
+        product.sizes?.some((size) => activeFilters.sizes.includes(size));
+
+      return matchesCategory && matchesSize;
+    });
+  }, [products, activeFilters]);
+
   const handleFilterChange = useCallback(
     (
-      filtered: Product[],
+      _filtered: Product[],
       filters: { categories: string[]; sizes: string[] }
     ) => {
-      setFilteredProducts(filtered);
       setActiveFilters(filters);
     },
     []
   );
 
   const removeFilter = (type: "categories" | "sizes", value: string) => {
-    const newFilters = {
-      ...activeFilters,
-      [type]: activeFilters[type].filter((v) => v !== value),
-    };
-    setActiveFilters(newFilters);
+    setActiveFilters((prev) => ({
+      ...prev,
+      [type]: prev[type].filter((v) => v !== value),
+    }));
   };
 
   const clearAllFilters = () => {
     setActiveFilters({ categories: [], sizes: [] });
-    setFilteredProducts(products);
   };
 
   const hasActiveFilters =
     activeFilters.categories.length > 0 || activeFilters.sizes.length > 0;
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <LoadingSpinner size="large" />
+        <p className="ml-4">Loading products...</p>
+      </div>
+    );
+  }
+
+  if (error || isError) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-red-600 mb-4">
+          Failed to load products. Please try again.
+        </div>
+        <pre className="text-xs text-left bg-gray-100 p-4 rounded max-w-2xl mx-auto overflow-auto">
+          {JSON.stringify(error, null, 2)}
+        </pre>
+      </div>
+    );
+  }
+
+  if (!products || products.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-nsanity-black/60 mb-4">
+          No products available yet.
+        </p>
+        <p className="text-sm text-gray-500">
+          Debug: Products array is {products ? "empty" : "undefined"}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4">
-      {/* Filter bar + result count */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-nsanity-gray">
         <ProductFilters
           products={products}
@@ -66,7 +114,6 @@ export default function ProductsContainer({
         </span>
       </div>
 
-      {/* Active filter chips */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2 mb-6">
           <span className="text-sm font-medium">Active filters:</span>

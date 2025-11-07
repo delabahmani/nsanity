@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProfileHeader from "@/components/Profile/ProfileHeader";
 import ProfileTabs from "@/components/Profile/ProfileTabs";
 import ProfileInfo from "@/components/Profile/ProfileInfo";
@@ -30,14 +30,44 @@ interface UserProfile {
 export default function ProfileClient() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
+  const urlTab = searchParams.get("tab") as
+    | "profile"
+    | "favorites"
+    | "orders"
+    | "settings"
+    | null;
   const [tab, setTab] = useState<
     "profile" | "favorites" | "orders" | "settings"
-  >("profile");
+  >(
+    urlTab && ["profile", "favorites", "orders", "settings"].includes(urlTab)
+      ? urlTab
+      : "profile"
+  );
+
   const [isEditing, setIsEditing] = useState(false);
   const [userInfo, setUserInfo] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync tab with URL parameter
+  useEffect(() => {
+    if (
+      urlTab &&
+      ["profile", "favorites", "orders", "settings"].includes(urlTab)
+    ) {
+      setTab(urlTab);
+    }
+  }, [urlTab]);
+
+  // Update URL when tab changes
+  const handleTabChange = (
+    newTab: "profile" | "favorites" | "orders" | "settings"
+  ) => {
+    setTab(newTab);
+    router.push(`/profile?tab=${newTab}`, { scroll: false });
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -130,7 +160,7 @@ export default function ProfileClient() {
       }
 
       setIsEditing(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error("Failed to update profile. Please try again.");
     } finally {
@@ -141,7 +171,7 @@ export default function ProfileClient() {
   // Loading state
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20 nav-pad flex flex-col items-center justify-center">
         <LoadingSpinner size="large" />
         <p className="mt-4 text-gray-600">Loading profile...</p>
       </div>
@@ -151,7 +181,7 @@ export default function ProfileClient() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20 nav-pad flex flex-col items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
           <button
@@ -173,17 +203,17 @@ export default function ProfileClient() {
   // No user info loaded
   if (!userInfo) {
     return (
-      <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20 nav-pad flex flex-col items-center justify-center">
         <p className="text-gray-600">No profile data found</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fffbf8] nav-pad flex flex-col items-center">
+    <div className="min-h-screen bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20 nav-pad flex flex-col items-center">
       <div className="w-full px-4 py-4 lg:py-10 md:max-w-5xl md:mx-auto">
         <ProfileHeader name={userInfo.name} />
-        <ProfileTabs tab={tab} setTab={setTab} />
+        <ProfileTabs tab={tab} setTab={handleTabChange} />
         {tab === "profile" && (
           <ProfileInfo
             userInfo={userInfo}

@@ -47,7 +47,7 @@ export default function ProfileTabs({
           onClick={() => setTab(t.key)}
           className={`flex items-center justify-center gap-2 font-medium transition-colors cursor-pointer whitespace-nowrap
             px-0 sm:px-3 py-0 sm:py-3
-            min-w-[56px] h-12 sm:h-auto sm:min-w-0 sm:flex-1
+            min-w-14 h-12 sm:h-auto sm:min-w-0 sm:flex-1
             ${tab === t.key ? "border-b-2 border-nsanity-black bg-white" : "text-nsanity-black/60 hover:bg-nsanity-gray"}`}
         >
           {t.icon}

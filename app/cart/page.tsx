@@ -33,7 +33,7 @@ function CartItemComponent({
   removeFromCart: (productId: string, size: string, color: string) => void;
 }) {
   return (
-    <div className="bg-white border border-nsanity-gray rounded-xl p-4 md:p-5 flex items-center gap-3">
+    <div className="bg-nsanity-cream/40 border border-nsanity-gray rounded-xl p-4 md:p-5 flex items-center gap-3">
       <div className="relative w-20 h-20 md:w-28 md:h-28 shrink-0 rounded-lg overflow-hidden bg-nsanity-cream border border-dashed border-black/50">
         <Image
           src={item.image || "/images/placeholder.webp"}
@@ -99,7 +99,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="nav-pad mx-auto bg-nsanity-cream/20">
+      <div className="nav-pad mx-auto bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20">
         <div className="md:py-16 text-center justify-center items-center flex flex-col space-y-2">
           <ShoppingBag size={70} className="text-nsanity-black/80" />
           <h1 className="text-2xl font-semibold py-2">Your cart is empty</h1>
@@ -115,7 +115,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="nav-pad bg-nsanity-cream overflow-x-hidden">
+    <div className="nav-pad bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20 overflow-x-hidden">
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full">
@@ -162,8 +162,15 @@ export default function CartPage() {
 
           <div className="flex flex-col items-end gap-2">
             <Link href="/products" className="hidden md:block">
-              <Button variant="ghost" className="flex items-center gap-2">
-                <ArrowLeft size={16} /> Continue Shopping
+              <Button
+                variant="ghost"
+                className=" gap-2 text-black font-semibold flex items-center py-4 w-fit hover:text-nsanity-darkorange transition-colors group"
+              >
+                <ArrowLeft
+                  size={16}
+                  className="group-hover:-translate-x-1 transition-transform"
+                />{" "}
+                Continue Shopping
               </Button>
             </Link>
             <Button

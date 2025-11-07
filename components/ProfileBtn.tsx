@@ -55,7 +55,7 @@ export default function ProfileBtn({ session }: { session: Session | null }) {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute -right-0 mt-4 md:w-64 z-50"
+          className="absolute right-0 mt-4 md:w-64 z-50"
           role="menu"
           aria-label="Profile menu"
           onClick={handleMenuClick}

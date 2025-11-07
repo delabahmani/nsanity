@@ -70,24 +70,13 @@ export default function Modal({
     }
   };
 
-  // Apply body styles immediately when open state changes
   useEffect(() => {
     if (isOpen) {
-      const scrollbarWidth =
-        window.innerWidth - document.documentElement.clientWidth;
-      const originalPaddingRight =
-        parseInt(window.getComputedStyle(document.body).paddingRight) || 0;
-
       document.body.style.overflow = "hidden";
-      document.body.style.paddingRight = `${
-        originalPaddingRight + scrollbarWidth
-      }px`;
+      return () => {
+        document.body.style.overflow = "";
+      };
     }
-
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.paddingRight = "";
-    };
   }, [isOpen]);
 
   // Handle escape key to close
@@ -127,7 +116,7 @@ export default function Modal({
     >
       <div
         ref={modalRef}
-        className={`bg-white rounded-lg shadow-xl relative w-full ${maxWidth} ${
+        className={`bg-[#fffbf8] border border-nsanity-darkorange/60 rounded-lg shadow-2xl relative w-full ${maxWidth} ${
           isClosing ? "modal-slide-down-animation" : "modal-slide-up-animation"
         }`}
         onClick={(e) => e.stopPropagation()}

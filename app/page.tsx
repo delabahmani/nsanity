@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen nav-pad bg-nsanity-cream/50">
+    <div className="flex flex-col min-h-screen nav-pad bg-linear-to-br from-[#fffbf8] via-white to-orange-50/20">
       <section className="relative">
         <div className="relative w-full h-screen sm:h-[55vh] md:h-[70vh] lg:h-[calc(100vh-72px)] overflow-hidden">
           {/* Image for larger screens */}

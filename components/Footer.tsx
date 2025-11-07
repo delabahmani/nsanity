@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import Logo from "./ui/Logo";
+import Container from "./ui/Container";
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -22,90 +23,92 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-nsanity-gray bg-white">
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 text-center md:text-left">
-          <div className="justify-self-center md:justify-self-start">
-            <Logo variant="footer" className="m-4 mx-auto md:mx-0" />
+      <Container>
+        <div className="py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-6 text-center md:text-left">
+            <div className="justify-self-center md:justify-self-start">
+              <Logo variant="footer" className="m-4 mx-auto md:mx-0" />
+            </div>
+
+            <nav className="justify-self-center" aria-label="Footer">
+              <ul className="flex items-center gap-6 text-nsanity-black/80">
+                <li>
+                  <Link
+                    href="/"
+                    className="hover:text-nsanity-darkorange transition-colors"
+                  >
+                    home
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/products"
+                    className="hover:text-nsanity-darkorange transition-colors"
+                  >
+                    shop
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className="hover:text-nsanity-darkorange transition-colors"
+                  >
+                    contact
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/cart"
+                    className="hover:text-nsanity-darkorange transition-colors"
+                  >
+                    cart
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            <div className="justify-self-center md:justify-self-end mb-4 md:mb-0">
+              {instagram && (
+                <Link
+                  href={instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-nsanity-black/70 hover:text-nsanity-darkorange transition-colors"
+                >
+                  <InstagramIcon className="w-6 h-6 fill-current" />
+                </Link>
+              )}
+            </div>
           </div>
 
-          <nav className="justify-self-center" aria-label="Footer">
-            <ul className="flex items-center gap-6 text-nsanity-black/80">
-              <li>
-                <Link
-                  href="/"
-                  className="hover:text-nsanity-darkorange transition-colors"
-                >
-                  home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/products"
-                  className="hover:text-nsanity-darkorange transition-colors"
-                >
-                  shop
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-nsanity-darkorange transition-colors"
-                >
-                  contact
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/cart"
-                  className="hover:text-nsanity-darkorange transition-colors"
-                >
-                  cart
-                </Link>
-              </li>
-            </ul>
-          </nav>
+          <hr />
 
-          <div className="justify-self-center md:justify-self-end mb-4 md:mb-0">
-            {instagram && (
+          <div className="mt-8 text-center text-sm text-nsanity-black/60 space-y-3">
+            <div>© {year} NSANITY. All rights reserved.</div>
+            <div className="inline-flex items-center gap-1 text-xs">
+              Built by{" "}
               <Link
-                href={instagram}
+                className="text-nsanity-darkorange hover:underline"
+                href={"https://delara-khaki.vercel.app"}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="text-nsanity-black/70 hover:text-nsanity-darkorange transition-colors"
+                aria-label="Github"
               >
-                <InstagramIcon className="w-6 h-6 fill-current" />
-              </Link>
-            )}
+                Delara Bahmani
+              </Link>{" "}
+              with
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3 h-3 text-nsanity-darkorange fill-current"
+                aria-hidden="true"
+              >
+                <path d="M12 21s-7.2-4.3-9.7-8.2C.3 10.3 1 6.8 3.7 5.3 6 .8 9 2.6 12 5.7c3-3.1 6-4.9 8.3-3.4 2.6 1.5 3.4 5 1.4 7.5C19.2 16.7 12 21 12 21z" />
+              </svg>
+            </div>
           </div>
         </div>
-
-        <hr />
-
-        <div className="mt-8 text-center text-sm text-nsanity-black/60 space-y-3">
-          <div>© {year} NSANITY. All rights reserved.</div>
-          <div className="inline-flex items-center gap-1 text-xs">
-            Built by{" "}
-            <Link
-              className="text-nsanity-darkorange hover:underline"
-              href={"https://delara-khaki.vercel.app"}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Github"
-            >
-              Delara Bahmani
-            </Link>{" "}
-            with
-            <svg
-              viewBox="0 0 24 24"
-              className="w-3 h-3 text-nsanity-darkorange fill-current"
-              aria-hidden="true"
-            >
-              <path d="M12 21s-7.2-4.3-9.7-8.2C.3 10.3 1 6.8 3.7 5.3 6 .8 9 2.6 12 5.7c3-3.1 6-4.9 8.3-3.4 2.6 1.5 3.4 5 1.4 7.5C19.2 16.7 12 21 12 21z" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      </Container>
     </footer>
   );
 }

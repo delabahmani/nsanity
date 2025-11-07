@@ -1,7 +1,7 @@
 import { getProductById } from "@/lib/utils/product-utils";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import ProductClient from "./ProductClient";
+import ProductClient from "@/components/Products/ProductClient";
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;

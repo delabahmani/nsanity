@@ -60,7 +60,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
       }}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between p-4 border-b border-nsanity-gray/30">
+      <div className="flex items-center justify-between py-6 px-4 border-b border-nsanity-gray/30">
         <Logo variant="navbar" />
 
         {/* Hamburger */}
@@ -168,7 +168,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
                 className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-nsanity-cream transition"
               >
                 <User size={20} className="text-nsanity-black/70" />
-                <span className="font-medium">Profile</span>
+                <span className="font-medium">profile</span>
               </Link>
 
               {session.user.isAdmin && (
@@ -181,7 +181,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
                     size={20}
                     className="text-nsanity-black/70"
                   />
-                  <span className="font-medium">Admin</span>
+                  <span className="font-medium">admin</span>
                 </Link>
               )}
 
@@ -191,7 +191,7 @@ export default function NavbarMobile({ session }: NavbarMobileProps) {
                 className="flex items-center gap-3 px-4 py-2 rounded-md hover:bg-nsanity-cream transition"
               >
                 <Settings size={20} className="text-nsanity-black/70" />
-                <span className="font-medium">Settings</span>
+                <span className="font-medium">settings</span>
               </Link>
 
               <button
