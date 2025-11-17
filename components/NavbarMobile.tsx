@@ -11,16 +11,13 @@ import { useCart } from "./CartContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Session } from "next-auth";
 import Button from "./ui/Button";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Logo from "./ui/Logo";
 
-type NavbarMobileProps = {
-  session: Session | null;
-};
 
-export default function NavbarMobile({ session }: NavbarMobileProps) {
+export default function NavbarMobile() {
+  const {data: session} = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
