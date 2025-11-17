@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
 import { Metadata } from "next";
 import Providers from "@/components/Providers";
+import Chatbot from "@/components/Chatbot";
 
 export const metadata: Metadata = {
   title: "nsanity",
@@ -44,6 +45,7 @@ export default function RootLayout({
           <NavbarContainer />
           <main className="flex-1">{children}</main>
           <Footer />
+          <Chatbot />
         </Providers>
       </body>
     </html>

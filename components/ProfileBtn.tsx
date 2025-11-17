@@ -1,12 +1,12 @@
 import { LayoutDashboard, LogOut, Settings, User } from "lucide-react";
-import { Session } from "next-auth";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "./CartContext";
 
-export default function ProfileBtn({ session }: { session: Session | null }) {
+export default function ProfileBtn() {
+  const { data: session } = useSession();
   const { clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const user = session?.user;

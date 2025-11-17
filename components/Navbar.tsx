@@ -8,12 +8,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ProfileBtn from "./ProfileBtn";
-import { Session } from "next-auth";
 import Button from "./ui/Button";
 import Logo from "./ui/Logo";
 import Container from "./ui/Container";
+import { useSession } from "next-auth/react";
+import LoadingSpinner from "./LoadingSpinner";
 
-export default function Navbar({ session }: { session: Session | null }) {
+export default function Navbar() {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const [pop, setPop] = useState(false);
 
@@ -88,14 +90,16 @@ export default function Navbar({ session }: { session: Session | null }) {
 
           <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:items-center">
             <div className="lg:flex lg:gap-x-6 hidden lg:items-center">
-              {session ? (
-                <ProfileBtn session={session} />
+              {status === "loading" ? (
+                <LoadingSpinner size="medium" />
+              ) : session ? (
+                <ProfileBtn />
               ) : (
                 <Link
-                  href={"/auth/sign-in"}
+                  href="/auth/sign-in"
                   className="text-sm font-semibold text-nsanity-black link-hover"
                 >
-                  SIGN IN
+                  sign in
                 </Link>
               )}
 

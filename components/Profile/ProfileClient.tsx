@@ -28,7 +28,7 @@ interface UserProfile {
 }
 
 export default function ProfileClient() {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -159,7 +159,11 @@ export default function ProfileClient() {
         throw new Error("Failed to update profile");
       }
 
+      await update({ name: userInfo.name });
+
       setIsEditing(false);
+      toast.success("Profile updated successfully!");
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error("Failed to update profile. Please try again.");
