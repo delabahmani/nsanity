@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-
 export const orderKeys = {
   all: ["orders"] as const,
 };
 
-interface OrderItem {
+export interface OrderItem {
   id: string;
   productId: string;
   quantity: number;
@@ -28,17 +26,13 @@ export interface Order {
   orderItems: OrderItem[];
 }
 
-async function fetchOrders(): Promise<Order[]> {
-  const res = await fetch("/api/user/orders");
-  if (!res.ok) throw new Error("Failed to fetch orders");
-  const data = await res.json();
-  return data.orders || [];
-}
+export async function fetchOrders(): Promise<Order[]> {
+  const res = await fetch("/api/user/orders", { credentials: "include" });
 
-export function useOrders() {
-  return useQuery({
-    queryKey: orderKeys.all,
-    queryFn: fetchOrders,
-    staleTime: 60 * 1000,
-  });
+  if (res.status === 401) return [];
+
+  if (!res.ok) throw new Error("Failed to fetch orders");
+
+  const data = await res.json();
+  return Array.isArray(data.orders) ? data.orders : [];
 }

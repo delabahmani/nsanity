@@ -5,16 +5,15 @@ import { useState } from "react";
 import Button from "../ui/Button";
 import OrderDetailsModal from "./OrderDetailsModal";
 import LoadingSpinner from "../LoadingSpinner";
-import { useOrders } from "@/lib/queries/orders";
+import { useOrderContext } from "../OrderContext";
+import type { Order } from "@/lib/queries/orders";
 
 export default function ProfileOrders() {
-  const { data: orders = [], isLoading, error } = useOrders();
-  const [selectedOrder, setSelectedOrder] = useState<(typeof orders)[0] | null>(
-    null
-  );
+  const { orders, isLoading, error } = useOrderContext();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleViewDetails = (order: (typeof orders)[0]) => {
+  const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
@@ -38,7 +37,7 @@ export default function ProfileOrders() {
         <h2 className="font-semibold text-lg flex items-center gap-2 mb-4 text-red-600">
           <Package className="w-5 h-5" /> Error Loading Orders
         </h2>
-        <div className="text-red-500">Failed to load orders</div>
+        <div className="text-red-500">{error}</div>
       </div>
     );
   }

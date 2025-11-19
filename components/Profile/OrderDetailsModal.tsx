@@ -5,30 +5,8 @@ import Modal from "../Modal";
 import { Calendar, CreditCard, MapPin, Package } from "lucide-react";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
-
-interface OrderItem {
-  id: string;
-  productId: string;
-  quantity: number;
-  color: string;
-  size: string;
-  price: number;
-  product?: {
-    id: string;
-    name: string;
-    images: string[];
-  };
-}
-
-interface Order {
-  id: string;
-  orderCode?: string;
-  totalAmount: number;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  orderItems: OrderItem[];
-}
+import { useOrderContext } from "../OrderContext";
+import type { Order, OrderItem } from "@/lib/queries/orders";
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
@@ -41,6 +19,8 @@ export default function OrderDetailsModal({
   onClose,
   order,
 }: OrderDetailsModalProps) {
+  const { refreshOrders } = useOrderContext();
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "fulfilled":
@@ -87,12 +67,13 @@ export default function OrderDetailsModal({
   const handleCancelOrder = async () => {
     if (!confirm("Are you sure you want to cancel this order?")) return;
 
-    const response = await fetch(`/api/user/orders/${order.id}/cancel`, {
+    const res = await fetch(`/api/user/orders/${order.id}/cancel`, {
       method: "POST",
     });
 
-    if (response.ok) {
+    if (res.ok) {
       toast.success("Order cancelled successfully");
+      await refreshOrders();
       onClose();
     } else {
       toast.error("Failed to cancel order");

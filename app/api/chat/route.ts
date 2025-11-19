@@ -54,7 +54,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { messages }: { messages: Message[] } = await req.json();
+    const {
+      messages,
+      orders: cachedOrders,
+      ordersLoading,
+    }: {
+      messages: Message[];
+      orders?: Array<{
+        id: string;
+        orderCode?: string;
+        status: string;
+        totalAmount: number;
+        createdAt: string;
+        orderItems?: Array<{
+          quantity: number;
+          product?: { name?: string };
+        }>;
+      }>;
+      ordersLoading?: boolean;
+    } = await req.json();
 
     // Validation: Max 10 messages in conversation
     if (messages.length > 10) {
@@ -66,9 +84,9 @@ export async function POST(req: NextRequest) {
 
     // Validation: Max message length
     const lastMessage = messages[messages.length - 1];
-    if (!lastMessage || lastMessage.content.length > 500) {
+    if (!lastMessage || lastMessage.content.length > 300) {
       return NextResponse.json(
-        { error: "Message too long. Keep it under 500 characters." },
+        { error: "Message too long. Keep it under 300 characters." },
         { status: 400 }
       );
     }
@@ -96,55 +114,84 @@ export async function POST(req: NextRequest) {
     let userContext = "";
 
     if (session?.user?.email) {
-      // Get user first
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { id: true },
-      });
+      let recentOrders =
+        Array.isArray(cachedOrders) && cachedOrders.length > 0
+          ? cachedOrders
+          : [];
 
-      if (user) {
-        const orders = await prisma.order.findMany({
-          where: { userId: user.id },
-          orderBy: { createdAt: "desc" },
-          take: 3,
-          select: {
-            id: true,
-            orderCode: true,
-            status: true,
-            totalAmount: true,
-            createdAt: true,
-            orderItems: {
-              select: {
-                product: {
-                  select: {
-                    name: true,
-                  },
-                },
-                quantity: true,
-              },
-            },
-          },
+      if (recentOrders.length === 0 && !ordersLoading) {
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { id: true },
         });
 
-        if (orders.length > 0) {
-          userContext = `\n\nUSER CONTEXT:
+        if (user) {
+          const dbOrders = await prisma.order.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+            take: 3,
+            select: {
+              id: true,
+              orderCode: true,
+              status: true,
+              totalAmount: true,
+              createdAt: true,
+              orderItems: {
+                select: {
+                  quantity: true,
+                  product: { select: { name: true } },
+                },
+              },
+            },
+          });
+
+          recentOrders = dbOrders.map((order) => ({
+            id: order.id,
+            orderCode: order.orderCode ?? undefined,
+            status: order.status,
+            totalAmount: order.totalAmount,
+            createdAt: order.createdAt.toISOString(),
+            orderItems: order.orderItems.map((item) => ({
+              quantity: item.quantity,
+              product: { name: item.product.name },
+            })),
+          }));
+        }
+      }
+
+      if (recentOrders.length > 0) {
+        userContext = `
+
+USER CONTEXT:
 - User is authenticated: ${session.user.name || session.user.email}
-- Recent orders:
-${orders
+- Total known orders: ${recentOrders.length}
+${recentOrders
   .map(
     (order, i) =>
-      `  ${i + 1}. Order ${order.orderCode} - ${order.status} - $${order.totalAmount} - ${new Date(order.createdAt).toLocaleDateString()}
-     Items: ${order.orderItems.map((item) => `${item.quantity}x ${item.product.name}`).join(", ")}`
+      `  Order #${i + 1}: ${order.orderCode ?? "N/A"}
+     Status: ${order.status}
+     Total: $${order.totalAmount}
+     Date: ${new Date(order.createdAt).toLocaleDateString()}
+     Items: ${
+       order.orderItems
+         ?.map((item) => `${item.quantity}x ${item.product?.name ?? "Item"}`)
+         .join(", ") ?? "None"
+     }`
   )
   .join("\n")}
 
-When asked about orders, refer to these specific orders by their order code (e.g., NS-20251016-322497), NOT by internal IDs.`;
-        }
+STRICT ORDER RULES:
+1. Order #1 is the most recent. Order #2 is the one before that. Order #3 is the one before Order #2, etc.
+2. When the user asks "the one before that" or "before this", reference the NEXT number in the list.
+3. If you've shown Order #2 and they ask for "before that", show Order #3.
+4. This list is complete—do NOT assume any other orders exist beyond what's numbered above.
+5. Never invent order numbers, products, or totals.
+`;
       }
     }
 
     // Init gemini flash model
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Build convo history
     const history =
@@ -158,7 +205,7 @@ When asked about orders, refer to these specific orders by their order code (e.g
     const chat = model.startChat({
       history,
       generationConfig: {
-        maxOutputTokens: 200,
+        maxOutputTokens: 500,
         temperature: 0.7,
       },
     });
@@ -177,7 +224,11 @@ WHAT YOU CAN HELP WITH:
 - Products: T-shirts, hoodies, crewnecks, and muscle tees
 - Shipping: Free shipping on all orders
 - Returns and sizing: Size guides on product pages
-- Order tracking and support${userContext ? "\n- User-specific order information (see USER CONTEXT below)" : ""}
+- Order tracking and support${
+      userContext
+        ? "\n- User-specific order information (see USER CONTEXT below)"
+        : ""
+    }
 
 ${userContext}
 
@@ -187,10 +238,7 @@ Keep responses brief (2-3 sentences max) and friendly. If asked about order stat
     const userMessage = lastMessage.content;
 
     // Combine system context with user msg for first interaction
-    const prompt =
-      messages.length === 1
-        ? `${systemContext}\n\nUser: ${userMessage}`
-        : userMessage;
+    const prompt = `${systemContext}\n\nUser: ${userMessage}`;
 
     const result = await chat.sendMessage(prompt);
     const response = await result.response;

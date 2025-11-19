@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import Button from "./ui/Button";
+import { useOrderContext } from "./OrderContext";
 
 interface Message {
   role: "user" | "assistant";
@@ -11,6 +12,7 @@ interface Message {
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const { orders, isLoading: isOrdersLoading } = useOrderContext();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -19,31 +21,79 @@ export default function Chatbot() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUnread, setHasUnread] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
+  const isOpenRef = useRef(isOpen);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [messages, isOpen]);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+    if (isOpen) setHasUnread(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        chatWindowRef.current &&
+        !chatWindowRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input };
+    const conversationMessages = [
+      ...messages.filter((msg, idx) => idx !== 0 || msg.role === "user"),
+      userMessage,
+    ];
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     try {
-      const conversationMessages = messages.filter((msg, idx) => idx !== 0 || msg.role === "user");
-      
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...conversationMessages, userMessage] }),
+        body: JSON.stringify({
+          messages: conversationMessages,
+          orders: orders.map((o) => ({
+            id: o.id,
+            orderCode: o.orderCode,
+            status: o.status,
+            totalAmount: o.totalAmount,
+            createdAt: o.createdAt,
+            orderItems: o.orderItems?.map((item) => ({
+              quantity: item.quantity,
+              product: { name: item.product?.name },
+            })),
+          })),
+          ordersLoading: isOrdersLoading,
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to get response");
@@ -53,6 +103,15 @@ export default function Chatbot() {
         ...prev,
         { role: "assistant", content: data.message },
       ]);
+
+      if (!isOpenRef.current) {
+        setHasUnread(true);
+      }
+
+      setHasUnread((prevUnread) => {
+        if (!isOpen) return true;
+        return prevUnread;
+      });
     } catch (error) {
       console.error("Chat error:", error);
       setMessages((prev) => [
@@ -62,6 +121,11 @@ export default function Chatbot() {
           content: "Sorry, I'm having trouble right now. Please try again! 😅",
         },
       ]);
+
+      setHasUnread((prevUnread) => {
+        if (!isOpen) return true;
+        return prevUnread;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +135,13 @@ export default function Chatbot() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    if (value.length <= 300) {
+      setInput(value);
     }
   };
 
@@ -87,16 +158,21 @@ export default function Chatbot() {
             size={24}
             className="group-hover:rotate-12 transition-transform"
           />
-          <span className="absolute -top-1 -right-1 flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-nsanity-pink opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-nsanity-pink"></span>
-          </span>
+          {hasUnread && (
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-nsanity-pink opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-nsanity-pink"></span>
+            </span>
+          )}
         </button>
       )}
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[550px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden">
+        <div
+          ref={chatWindowRef}
+          className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-3rem)] h-[550px] bg-white rounded-2xl shadow-2xl flex flex-col border border-gray-200 overflow-hidden"
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-nsanity-orange to-nsanity-darkorange text-white">
             <div className="flex items-center gap-2">
@@ -123,13 +199,13 @@ export default function Chatbot() {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] px-4 py-2.5 rounded-2xl shadow-sm ${
+                  className={`max-w-[85%] px-4 py-2.5 rounded-2xl shadow-sm break-words ${
                     msg.role === "user"
                       ? "bg-linear-to-br from-nsanity-orange to-nsanity-darkorange text-white"
                       : "bg-white text-gray-800 border border-gray-200"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                     {msg.content}
                   </p>
                 </div>
@@ -150,27 +226,34 @@ export default function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
+          {/* Text area */}
           <div className="p-4 border-t bg-white">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="Ask me anything..."
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-nsanity-orange focus:border-transparent text-sm"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={sendMessage}
-                variant="primary"
-                size="sm"
-                disabled={isLoading || !input.trim()}
-                className="rounded-xl px-4 shrink-0"
-              >
-                <Send size={18} />
-              </Button>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <textarea
+                  value={input}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Ask me anything..."
+                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-nsanity-orange focus:border-transparent text-sm sm:text-base resize-none"
+                  disabled={isLoading}
+                  maxLength={300}
+                  style={{ fontSize: "16px" }}
+                  rows={2}
+                />
+                <Button
+                  onClick={sendMessage}
+                  variant="primary"
+                  size="sm"
+                  disabled={isLoading || !input.trim()}
+                  className="rounded-xl px-4 shrink-0"
+                >
+                  <Send size={18} />
+                </Button>
+              </div>
+              <div className="text-xs text-gray-500 text-right">
+                {input.length}/300
+              </div>
             </div>
           </div>
         </div>
