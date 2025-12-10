@@ -18,7 +18,7 @@ export async function GET() {
       email: true,
       image: true,
       phone: true,
-      address: true,
+      addresses: true,
       createdAt: true,
       isAdmin: true,
       wishlist: true,
@@ -29,21 +29,8 @@ export async function GET() {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // Parse address
-  let parsedAddress = null;
-  if (user.address) {
-    try {
-      parsedAddress =
-        typeof user.address === "string"
-          ? JSON.parse(user.address)
-          : user.address;
-    } catch (e) {
-    }
-  }
-
   return NextResponse.json({
     ...user,
-    address: parsedAddress,
   });
 }
 
@@ -64,15 +51,68 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Get user to check existing addresses
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: { addresses: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     // Update user profile
     await prisma.user.update({
       where: { email: session.user.email },
       data: {
         name: name.trim(),
         phone: phone || null,
-        address: address ? JSON.stringify(address) : null,
       },
     });
+
+    // Handle address update/creation if provided
+    if (
+      address &&
+      address.address1 &&
+      address.city &&
+      address.postalCode &&
+      address.country
+    ) {
+      const existingAddress = await prisma.address.findFirst({
+        where: {
+          userId: user.id,
+          address1: address.address1,
+          city: address.city,
+          postalCode: address.postalCode,
+        },
+      });
+
+      if (!existingAddress) {
+        await prisma.address.create({
+          data: {
+            userId: user.id,
+            address1: address.address1,
+            address2: address.address2 || null,
+            city: address.city,
+            state: address.state || null,
+            postalCode: address.postalCode,
+            country: address.country,
+            isDefault: user.addresses.length === 0,
+          },
+        });
+      } else if (address.setAsDefault) {
+        await prisma.address.updateMany({
+          where: { userId: user.id },
+          data: { isDefault: false },
+        });
+
+        // Set this one as default
+        await prisma.address.update({
+          where: { id: existingAddress.id },
+          data: { isDefault: true },
+        });
+      }
+    }
 
     return NextResponse.json({ message: "Profile updated successfully" });
   } catch (error) {

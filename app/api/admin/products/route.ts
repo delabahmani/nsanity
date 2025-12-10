@@ -111,6 +111,8 @@ export async function POST(req: NextRequest) {
 
     // Create in Printful
     let printfulSyncProductId = null;
+    let printfulSyncVariants = null; // Declare at the top level
+
     if (printfulTemplateId && designData) {
       try {
         // Map sizes and colors to proper format for Printful
@@ -141,6 +143,7 @@ export async function POST(req: NextRequest) {
         });
 
         printfulSyncProductId = printfulProduct.id;
+        printfulSyncVariants = printfulProduct.variantMappings; // Assign here
       } catch (error) {
         return NextResponse.json(
           { error: `Failed to create Printful product` },
@@ -166,6 +169,7 @@ export async function POST(req: NextRequest) {
         });
 
         printfulSyncProductId = printfulProduct.id;
+        printfulSyncVariants = printfulProduct.variantMappings; // Assign here
       } catch (error) {
         return NextResponse.json(
           { error: `Failed to create Printful product` },
@@ -188,6 +192,7 @@ export async function POST(req: NextRequest) {
         stripeProductId: stripeProduct.id,
         stripePriceId: stripePrice.id,
         printfulSyncProductId,
+        printfulSyncVariants, // Now it's in scope
         printfulTemplateId,
         designPositionData: designData ? JSON.stringify(designData) : null,
         isPrintOnDemand: !!printfulTemplateId,

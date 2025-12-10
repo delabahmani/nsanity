@@ -49,6 +49,31 @@ interface PrintfulSyncProduct {
   }>;
 }
 
+interface PrintfulOrderItem {
+  sync_variant_id?: number;
+  external_variant_id?: string;
+  quantity: number;
+  retail_price?: string;
+  name?: string;
+  product?: {
+    variant_id: number;
+    name: string;
+  };
+  files?: Array<{ url: string }>;
+}
+
+interface PrintfulOrderRecipient {
+  name: string;
+  address1: string;
+  address2?: string;
+  city: string;
+  state_code?: string;
+  country_code: string;
+  zip: string;
+  phone?: string;
+  email: string;
+}
+
 class PrintfulService {
   private apiKey: string;
   private storeId: string;
@@ -93,6 +118,7 @@ class PrintfulService {
   async createSyncProduct(params: CreateSyncProductParams): Promise<{
     success: boolean;
     id?: number;
+    variantMappings?: Record<string, number>;
     message?: string;
   }> {
     try {
@@ -107,6 +133,9 @@ class PrintfulService {
           throw new Error("Design upload failed");
         }
       }
+
+      // Store the mapping we're building
+      const variantMappings: Record<string, number> = {};
 
       // Update to use async variant lookup
       const syncVariants = await Promise.all(
@@ -162,18 +191,34 @@ class PrintfulService {
       });
 
       const printfulProductId = response.result?.id as number;
+      const createdVariants = response.result?.sync_variants || [];
 
       if (!printfulProductId) {
         throw new Error("No product ID returned from Printful");
       }
 
+      for (let i = 0; i < variants.length; i++) {
+        const variant = variants[i];
+        const syncVariant = createdVariants[i];
+
+        if (syncVariant?.id) {
+          const key = `${variant.size.toLowerCase()}-${variant.color.toLowerCase()}`;
+          variantMappings[key] = syncVariant.id;
+        }
+      }
+
       return {
         success: true,
         id: printfulProductId,
+        variantMappings,
         message: "Product created",
       };
     } catch (error) {
-      return { success: false, message: "Product creation failed" };
+      return {
+        success: false,
+        variantMappings: undefined,
+        message: "Product creation failed",
+      };
     }
   }
 
@@ -315,6 +360,45 @@ class PrintfulService {
     } catch (error) {
       return [];
     }
+  }
+
+  async createDraftOrder(orderData: {
+    externalId: string;
+    recipient: PrintfulOrderRecipient;
+    items: PrintfulOrderItem[];
+  }): Promise<{
+    success: boolean;
+    printfulOrderId?: number;
+    message?: string;
+  }> {
+    try {
+      const response = await this.request("/orders", {
+        method: "POST",
+        body: JSON.stringify({
+          external_id: orderData.externalId,
+          shipping: "STANDARD",
+          recipient: orderData.recipient,
+          items: orderData.items,
+        }),
+      });
+
+      return {
+        success: true,
+        printfulOrderId: response.result?.id,
+        message: "Draft order created successfully",
+      };
+    } catch (error) {
+      console.error("Failed to create Printful draft order:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getSyncProduct(productId: number) {
+    const res = await this.request(`/store/products/${productId}`);
+    return res.result;
   }
 
   // Helper to map size/color to Printful variant ID

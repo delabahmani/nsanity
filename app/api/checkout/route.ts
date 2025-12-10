@@ -16,7 +16,6 @@ const BASE_URL =
 
 export async function POST(req: NextRequest) {
   function generateOrderCode() {
-    // Example: NS-20240528-123456
     const date = new Date();
     const yyyymmdd = date.toISOString().slice(0, 10).replace(/-/g, "");
     const random = Math.floor(100000 + Math.random() * 900000);
@@ -29,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 400 });
   }
 
-  /// Parse cart from req
+  // Parse cart from req
   const { cart } = await req.json();
   if (!Array.isArray(cart) || cart.length === 0) {
     return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
@@ -108,7 +107,7 @@ export async function POST(req: NextRequest) {
     });
     stripeCustomerId = customer.id;
 
-    //Save to DB
+    // Save to DB
     await prisma.user.update({
       where: { id: user.id },
       data: { stripeCustomerId },
@@ -141,6 +140,12 @@ export async function POST(req: NextRequest) {
     customer: stripeCustomerId,
     line_items,
     mode: "payment",
+    shipping_address_collection: {
+      allowed_countries: ["US", "CA"],
+    },
+    phone_number_collection: {
+      enabled: true,
+    },
     success_url: `${BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${BASE_URL}/cart`,
     metadata: {
